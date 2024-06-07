@@ -1,8 +1,9 @@
 package org.firstinspires.ftc.teamcode;
 
 import android.annotation.SuppressLint;
-
 import androidx.annotation.NonNull;
+
+import com.acmerobotics.dashboard.config.Config;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -19,6 +20,7 @@ import java.util.Properties;
  * <h1>Constants Class</h1>
  *
  * <h2>Subsystem Nested Classes</h2>
+ * <br>
  * <p>
  *     Each subsystem declared in the Subsystems package has a corresponding nested class that
  *     contains the related values. Due to the way that the constants loader is implemented, any
@@ -28,6 +30,7 @@ import java.util.Properties;
  * </p>
  * <br>
  * <h2>Constants Loader</h2>
+ * <br>
  * <p>
  *     The constants loader is a class that loads a properties file from Constants.txt found in
  *     onbot java and fills in all of the fields for all of constants nested classes using
@@ -45,21 +48,25 @@ import java.util.Properties;
  */
 public class Constants {
 
+    @Config
     public static class LauncherConstants {
         public static volatile double LAUNCH_POSITION = 0.6;
         public static volatile double ZERO_POSITION   = 0.0;
     }
 
+    @Config
     public static class HangerConstants {
         public static volatile double HANG_POSITION = 1.0;
         public static volatile double ZERO_POSITION = 0.0;
     }
 
+    @Config
     public static class IntakeConstants {
         public static volatile double INTAKE_POWER  = 1.0;
         public static volatile double OUTTAKE_POWER = 0.4;
     }
 
+    @Config
     public static class ArmConstants {
         public static volatile double DEFAULT_ELEVATOR_POWER       = 1.0;
         public static volatile double DEFAULT_WORM_POWER           = 1.0;
@@ -93,6 +100,7 @@ public class Constants {
 
     /**
      * <h1>Constants Loader</h1>
+     * <br>
      * <p>
      *     The constants loader is a class that loads a properties file from Constants.txt found in
      *     onbot java and fills in all of the fields for all of constants nested classes using
@@ -111,13 +119,15 @@ public class Constants {
     public static class ConstantsLoader {
        private static final Properties properties = new Properties();
 
-       /*
-       TODO Try out Environment.getExternalStorageDirectory() so that it stops bugging me and we can
-       TODO rid of this stupid SuppressLint
-        */
+        /*
+         * Environment.getExternalStorageDirectory() doesn't actually work so we suppress it with a
+         * lint.
+         */
        @SuppressLint("SdCardPath")
-       private static final String CONSTANTS_FILE_LOCATION  = "/sdcard/FIRST/java/src/org/firstinspires/ftc/teamcode/";
-       private static final String CONSTANTS_FILE_NAME      = "Constants.txt";
+       private static final String CONSTANTS_FILE_LOCATION
+               = "/sdcard/FIRST/java/src/org/firstinspires/ftc/teamcode/";
+       private static final String CONSTANTS_FILE_NAME
+               = "Constants.txt";
 
        private static Telemetry telemetry;
 
