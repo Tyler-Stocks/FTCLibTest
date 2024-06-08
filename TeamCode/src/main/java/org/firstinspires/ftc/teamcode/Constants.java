@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -46,6 +47,8 @@ import java.util.Properties;
  * </p>
  */
 public class Constants {
+    public static final String intakeMotorName = "intakeMotor";
+
 
     @Config
     public static class LauncherConstants {
@@ -116,8 +119,6 @@ public class Constants {
      * </p>
      */
     public static class ConstantsLoader {
-        private static ArrayList<Properties> propertiesFiles = new ArrayList<>();
-
         /*
          Environment.getExternalStorageDirectory() doesn't actually work so we suppress it with a
          lint.
@@ -152,8 +153,12 @@ public class Constants {
 
        @Nullable private static Class<?> matchConstantsClassToConstantsFile(@NonNull String fileIdentifier) {
           for (Class<?> clazz : ConstantsLoader.class.getDeclaredClasses()) {
-              // Skip the constants loader
-              if (clazz.getName().equals("ConstantsLoaderClass")) continue;
+              // Skip constants loader class
+              if (clazz.getName().equals("ConstantsLoader")) continue;
+
+              int modifiers = clazz.getModifiers();
+
+              if (!Modifier.isStatic(modifiers) || !Modifier.isPublic(modifiers)) continue;
 
               if (clazz.getName().equals(fileIdentifier)) return clazz;
           }
@@ -168,11 +173,42 @@ public class Constants {
            Field[] fields = clazz.getDeclaredFields();
 
            for (Field field : fields) {
+                int modifiers = field.getModifiers();
 
+                // Skip all instance variables (Although there really shouldn't be any)
+                if (!Modifier.isStatic(modifiers)) continue;
+
+                // Skip any variables that we are not supposed to see or change
+                if (Modifier.isPrivate(modifiers) || Modifier.isProtected(modifiers) || Modifier.isFinal(modifiers)) continue;
+
+                populateField(field, properties);
            }
        }
 
+        /**
+         * Populates a field with its value from the properties file. If a key matching the name of
+         * the field is not found, the function will simply do nothing.
+         * @param field The field to populate
+         * @param properties The properties file to read from
+         */
+        private static void populateField(@NonNull Field field, @NonNull Properties properties) {
+            String fieldName   = field.getName();
+            Class<?> fieldType = field.getType();
 
+            if (!properties.containsKey(fieldName)) return;
+
+            try {
+                if (fieldType.isAssignableFrom(double.class)) {
+                    field.setDouble(fieldName, getDoubleFromPropertiesFile(fieldName, properties));
+                }
+
+                if (fieldType.isAssignableFrom(int.class)) {
+                    field.setInt(fieldName, getIntFromPropertiesFile(fieldName, properties));
+                }
+            } catch (IllegalAccessException exception) {
+                telemetry.addData("Illegal access to field", fieldName);
+            }
+        }
 
        public static void loadConstants() throws IOException {
             File[] constantsFiles = getConstantsFiles();
@@ -190,14 +226,17 @@ public class Constants {
                 // If there is no constants file that matches a constants class, continue.
                 if (constantsClass == null) continue;
 
-
-
+                populateClassFromPropertiesFile(constantsClass, fileName);
             }
        }
 
+       private static double getDoubleFromPropertiesFile(@NonNull String key, @NonNull Properties properties) {
+            return Double.parseDouble(properties.getProperty(key));
+       }
 
-
-
+       private static int getIntFromPropertiesFile(@NonNull String key, @NonNull Properties properties) {
+            return Integer.parseInt(properties.getProperty(key));
+       }
 
 
     }

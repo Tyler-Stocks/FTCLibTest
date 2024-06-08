@@ -14,7 +14,8 @@ public class ConstantsReaderTest extends OpMode {
 
     @Override public void init() {
         try {
-            ConstantsLoader.load(telemetry);
+            ConstantsLoader.setTelemetry(telemetry);
+            ConstantsLoader.loadConstants();
             telemetry.addData("Intake Power", INTAKE_POWER);
         } catch (IOException exception) {
             telemetry.addData("Failed to read from constants file", exception.getMessage());
