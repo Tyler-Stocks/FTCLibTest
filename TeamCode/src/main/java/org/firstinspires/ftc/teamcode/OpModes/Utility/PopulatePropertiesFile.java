@@ -4,10 +4,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import static org.firstinspires.ftc.teamcode.Constants.ConstantsLoader;
-
-import java.io.IOException;
-
 @TeleOp(name = "Utility - Populate Properties File", group = "Utility")
 @Disabled
 public class PopulatePropertiesFile extends LinearOpMode {
@@ -21,13 +17,6 @@ public class PopulatePropertiesFile extends LinearOpMode {
         telemetry.update();
 
         waitForStart();
-
-        try {
-            ConstantsLoader.saveConstantsToFile();
-            telemetry.addLine("Successfully overwrote Constants.txt");
-        } catch (IOException exception) {
-            telemetry.addData("Failed to overwrite Constants.txt", exception.getMessage());
-        }
 
         requestOpModeStop();
    }

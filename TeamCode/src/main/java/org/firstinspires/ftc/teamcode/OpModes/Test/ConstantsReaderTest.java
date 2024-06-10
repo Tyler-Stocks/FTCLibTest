@@ -5,7 +5,9 @@ import static org.firstinspires.ftc.teamcode.Constants.IntakeConstants.INTAKE_PO
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Constants.ConstantsLoader;
+import org.firstinspires.ftc.teamcode.ConstantsLoader;
+
+import static org.firstinspires.ftc.teamcode.Constants.ArmConstants.WORM_SAFETY_VOLTAGE;
 
 import java.io.IOException;
 
@@ -13,10 +15,12 @@ import java.io.IOException;
 public class ConstantsReaderTest extends OpMode {
 
     @Override public void init() {
+        ConstantsLoader constantsLoader = new ConstantsLoader(telemetry);
+
         try {
-            ConstantsLoader.setTelemetry(telemetry);
-            ConstantsLoader.loadConstants();
+            constantsLoader.loadConstants();
             telemetry.addData("Intake Power", INTAKE_POWER);
+            telemetry.addData("Worm Safety Voltage", WORM_SAFETY_VOLTAGE);
         } catch (IOException exception) {
             telemetry.addData("Failed to read from constants file", exception.getMessage());
         }
