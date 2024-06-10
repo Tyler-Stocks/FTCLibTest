@@ -15,7 +15,7 @@ public class LauncherSubsystem extends SubsystemBase {
     private final Servo launcherServo;
 
     public LauncherSubsystem(@NonNull HardwareMap hardwareMap) {
-        launcherServo = hardwareMap.get(Servo.class, "launcherServo");
+        launcherServo = hardwareMap.get(Servo.class, LAUNCHER_SERVO_NAME);
         launcherServo.setDirection(REVERSE);
     }
 

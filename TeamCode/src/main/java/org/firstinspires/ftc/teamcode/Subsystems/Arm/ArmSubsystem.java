@@ -38,21 +38,21 @@ public class ArmSubsystem extends SubsystemBase {
     public ArmSubsystem(@NonNull HardwareMap hardwareMap) {
 
         // Control Hub Digital Port 0
-        wormLimitSwitch  = hardwareMap.get(RevTouchSensor.class, "wormLimitSwitch");
+        wormLimitSwitch  = hardwareMap.get(RevTouchSensor.class, WORM_LIMIT_SWITCH_NAME);
         // Expansion Hub Digital Port 0
-        elevatorLimitSwitch = hardwareMap.get(RevTouchSensor.class, "elevatorLimitSwitch");
+        elevatorLimitSwitch = hardwareMap.get(RevTouchSensor.class, ELEVATOR_LIMIT_SWITCH_NAME);
 
         // Expansion Hub Motor Port 0
-        wormMotor  = hardwareMap.get(DcMotorImplEx.class, "wormMotor");
+        wormMotor  = hardwareMap.get(DcMotorImplEx.class, WORM_MOTOR_NAME);
         // Control Hub Motor Port 3
-        elevatorMotor = hardwareMap.get(DcMotorImplEx.class, "elevatorMotor");
+        elevatorMotor = hardwareMap.get(DcMotorImplEx.class, ELEVATOR_MOTOR_NAME);
 
         // Expansion Hub Port 1
-        leftOuttakeServo = hardwareMap.get(ServoImplEx.class, "leftOuttakeServo");
+        leftOuttakeServo = hardwareMap.get(ServoImplEx.class, LEFT_OUTTAKE_SERVO_NAME);
         // Expansion Hub Port 2
-        rightOuttakeServo = hardwareMap.get(ServoImplEx.class, "rightOuttakeServo");
+        rightOuttakeServo = hardwareMap.get(ServoImplEx.class, RIGHT_OUTTAKE_SERVO_NAME);
 
-        wormPotentiometer = hardwareMap.analogInput.get("wormPotentiometer");
+        wormPotentiometer = hardwareMap.analogInput.get(WORM_POTENTIOMETER_NAME);
 
         elevatorMotor.setDirection(REVERSE);
         elevatorMotor.setZeroPowerBehavior(BRAKE);

@@ -14,7 +14,7 @@ public class HangerSubsystem extends SubsystemBase {
     private final Servo hangerServo;
 
     public HangerSubsystem(@NonNull HardwareMap hardwareMap) {
-        hangerServo = hardwareMap.get(Servo.class, "hangerServo");
+        hangerServo = hardwareMap.get(Servo.class, HANGER_SERVO_NAME);
     }
 
     public void releaseHanger() {

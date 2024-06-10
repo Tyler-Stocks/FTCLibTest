@@ -13,7 +13,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.Properties;
 
 /**
@@ -24,52 +23,66 @@ import java.util.Properties;
  * <p>
  *     Each subsystem declared in the Subsystems package has a corresponding nested class that
  *     contains the related values. Due to the way that the constants loader is implemented, any
- *     constants values that are outside of a nested class will be ignored. This can be useful if
- *     you would like to have a constant that cannot be overwritten from onbot java such as the
- *     config file name of a hardware device.
+ *     constants values that are outside of a nested class are ignored.
  * </p>
  * <br>
  * <h2>Constants Loader</h2>
  * <br>
  * <p>
- *     The constants loader is a class that loads a properties file from Constants.txt found in
- *     onbot java and fills in all of the fields for all of constants nested classes using
- *     reflection. Due to this approach there is no need to modify this class if more constants, or
- *     nested classes are added.
+        The constants loader class loads constants from the files located in
+        /sdcard/FIRST/java/src/org/firstinspires/ftc/teamcode/Constants. each file located in the
+        aforementioned folder represent some group of constants (E.G Roadrunner, Arm Subsystem).
+        To assign a constants nested class a constants file in onbot java simply name the file
+        [Subsystem Name]Constants.txt. For example, to assign the nested IntakeConstants a file you
+        would name it IntakeConstants.txt. Any file that does not have a corresponding nested class
+        will be ignored, and any constants class without a corresponding file will default to the
+        values hardcoded into the class.
  * </p>
  * <br>
  * <p>
- *     Another important functionality of this class is to all the saving of all constants to the
- *     aforementioned properties file in onbot java. By calling the saveConstantsFile() function you
- *     can overwrite all of the values in onbot java with the ones that are hardcoded into the
- *     class. This operation is very dangerous as once the values are overwritten there is no way to
- *     get them back unless you have a backup.
+ *     Note that the nested class doesn't have to represent a subsystem. It could also represent
+ *     something more abstract such as vision or path following constants.
  * </p>
+ * <br>
  */
 public class Constants {
-    public static final String intakeMotorName = "intakeMotor";
-
 
     @Config
     public static class LauncherConstants {
+        public static final String LAUNCHER_SERVO_NAME = "launcherServo";
+
         public static volatile double LAUNCH_POSITION = 0.6;
         public static volatile double ZERO_POSITION   = 0.0;
     }
 
     @Config
     public static class HangerConstants {
+        public static final String HANGER_SERVO_NAME = "hangerServo";
+
         public static volatile double HANG_POSITION = 1.0;
         public static volatile double ZERO_POSITION = 0.0;
     }
 
     @Config
     public static class IntakeConstants {
+        public static final String INTAKE_MOTOR_NAME     = "intakeMotor";
+        public static final String FRONT_BEAM_BREAK_NAME = "frontBeamBreak";
+        public static final String BACK_BEAM_BREAK_NAME  = "backBeamBreak";
+
         public static volatile double INTAKE_POWER  = 1.0;
         public static volatile double OUTTAKE_POWER = 0.4;
     }
 
     @Config
     public static class ArmConstants {
+        public static final String WORM_MOTOR_NAME            = "wormMotor";
+        public static final String ELEVATOR_MOTOR_NAME        = "elevatorMotor";
+        public static final String WORM_LIMIT_SWITCH_NAME     = "wormLimitSwitch";
+        public static final String ELEVATOR_LIMIT_SWITCH_NAME = "elevatorLimitSwitch";
+        public static final String WORM_POTENTIOMETER_NAME    = "wormPotentiometer";
+        public static final String LEFT_OUTTAKE_SERVO_NAME    = "leftOuttakeServo";
+        public static final String RIGHT_OUTTAKE_SERVO_NAME   = "rightOuttakeServo";
+
         public static volatile double DEFAULT_ELEVATOR_POWER       = 1.0;
         public static volatile double DEFAULT_WORM_POWER           = 1.0;
         public static volatile double ELEVATOR_HOMING_POWER        = -0.8;
@@ -133,7 +146,16 @@ public class Constants {
           ConstantsLoader.telemetry = telemetry;
        }
 
-       private static File[] getConstantsFiles() throws IOException{
+
+        /**
+         * Gets a list of all of the files found in
+         * /sdcard/FIRST/java/src/org/firstinspires/ftc/teamcode/Constants
+         * @return An array containing all of the files found at the aforementioned location.
+         * Returns null if none are found.
+         * @throws IOException Throws an IOException if a file is found with the same name as the
+         * constants directory.
+         */
+       @Nullable private static File[] getConstantsFiles() throws IOException{
           File constantsDirectory = new File(CONSTANTS_FILE_LOCATION);
 
           if (constantsDirectory.isFile()) throw new IOException("Constants directory is a file");
@@ -141,8 +163,30 @@ public class Constants {
           return constantsDirectory.listFiles();
        }
 
+        /**
+         * Parses a camelCase file name into its identifier. For Example, "ArmConstants" would be
+         * parsed into "Arm".
+         * <b>
+         *     Note that file names with multiple camelCase words before the the "Constants" suffix
+         *     DO NOT WORK. For example, "RedBackdropAutoConstants" will currently be incorrectly
+         *     parsed into "Red". This will be fixed *at some point* in the future.
+         * </b>
+         * @param fileName A camelCase file name to be parsed into an identifier. For example
+         *                 "ArmConstants" or "RoadrunnerConstants". Note that a file with multiple
+         *                 camelCase words before constants DOES NOT CURRENTLY WORK. For example,
+         *                 a file with the name "RedAutoConstants" would have an identifier of
+         *                 "Red" instead of the intended "RedAuto".
+         * @return The identifier of the passed in file name, if found. For example "ArmConstants"
+         * would return "Arm". In the case that no identifier is found, or the file is not suffixed
+         * with the word "Constants" returns and empty string.
+         */
        @NonNull private static String parseFileName(@NonNull String fileName) {
+           // TODO make so that fileNames with more than two words like "RedAutoConstants" work
+
+           // Split the camel/Title case word into its sub words.
            String[] wordsInFileName = fileName.split("(?<!^)(?=[A-Z])");
+
+           if (wordsInFileName.length == 1) return "";
 
            String lastWordInFileName = wordsInFileName[wordsInFileName.length - 1];
 
@@ -152,13 +196,13 @@ public class Constants {
        }
 
        @Nullable private static Class<?> matchConstantsClassToConstantsFile(@NonNull String fileIdentifier) {
-          for (Class<?> clazz : ConstantsLoader.class.getDeclaredClasses()) {
+          for (Class<?> clazz : ConstantsLoader.class.getClasses()) {
               // Skip constants loader class
               if (clazz.getName().equals("ConstantsLoader")) continue;
 
               int modifiers = clazz.getModifiers();
 
-              if (!Modifier.isStatic(modifiers) || !Modifier.isPublic(modifiers)) continue;
+              if (!Modifier.isStatic(modifiers)) continue;
 
               if (clazz.getName().equals(fileIdentifier)) return clazz;
           }
@@ -170,7 +214,8 @@ public class Constants {
            Properties properties = new Properties();
            properties.load(new FileInputStream(CONSTANTS_FILE_LOCATION + fileName));
 
-           Field[] fields = clazz.getDeclaredFields();
+           // We use getFields not getDeclaredFields because we don't want private fields.
+           Field[] fields = clazz.getFields();
 
            for (Field field : fields) {
                 int modifiers = field.getModifiers();
@@ -178,8 +223,8 @@ public class Constants {
                 // Skip all instance variables (Although there really shouldn't be any)
                 if (!Modifier.isStatic(modifiers)) continue;
 
-                // Skip any variables that we are not supposed to see or change
-                if (Modifier.isPrivate(modifiers) || Modifier.isProtected(modifiers) || Modifier.isFinal(modifiers)) continue;
+                // Skip any final variables
+                if (Modifier.isFinal(modifiers)) continue;
 
                 populateField(field, properties);
            }
@@ -213,6 +258,12 @@ public class Constants {
        public static void loadConstants() throws IOException {
             File[] constantsFiles = getConstantsFiles();
 
+            // If there is no constants files, then we don't need to load the constants
+            if (constantsFiles == null) {
+                telemetry.addLine("No constants files found. Resorting to defaults.");
+                return;
+            }
+
             for (File file : constantsFiles) {
                 String fileName = file.getName();
 
@@ -237,7 +288,5 @@ public class Constants {
        private static int getIntFromPropertiesFile(@NonNull String key, @NonNull Properties properties) {
             return Integer.parseInt(properties.getProperty(key));
        }
-
-
     }
 }

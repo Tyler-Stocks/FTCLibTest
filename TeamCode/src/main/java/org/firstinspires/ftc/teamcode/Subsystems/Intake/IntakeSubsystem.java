@@ -27,10 +27,10 @@ public class IntakeSubsystem extends SubsystemBase {
     private boolean isActive;
 
     public IntakeSubsystem(@NonNull HardwareMap hardwareMap) {
-        intakeMotor = hardwareMap.get(DcMotorImplEx.class, "intakeMotor");
+        intakeMotor = hardwareMap.get(DcMotorImplEx.class, INTAKE_MOTOR_NAME);
 
-        frontBeamBreak = hardwareMap.get(DigitalChannel.class, "frontBeamBreak");
-        backBeamBreak  = hardwareMap.get(DigitalChannel.class, "backBeamBreak");
+        frontBeamBreak = hardwareMap.get(DigitalChannel.class, FRONT_BEAM_BREAK_NAME);
+        backBeamBreak  = hardwareMap.get(DigitalChannel.class, BACK_BEAM_BREAK_NAME);
 
         frontBeamBreak.setMode(INPUT);
         backBeamBreak.setMode(INPUT);
