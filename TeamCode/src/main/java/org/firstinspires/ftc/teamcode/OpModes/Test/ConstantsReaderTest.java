@@ -1,34 +1,36 @@
 package org.firstinspires.ftc.teamcode.OpModes.Test;
 
-import static org.firstinspires.ftc.teamcode.Constants.IntakeConstants.INTAKE_POWER;
+import static org.firstinspires.ftc.teamcode.Constants.Constants.IntakeConstants.INTAKE_POWER;
 
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.ConstantsLoader;
+import org.firstinspires.ftc.teamcode.Constants.ConstantsLoader;
 
-import static org.firstinspires.ftc.teamcode.Constants.ArmConstants.WORM_SAFETY_VOLTAGE;
+import static org.firstinspires.ftc.teamcode.Constants.Constants.ArmConstants.WORM_SAFETY_VOLTAGE;
 
 import java.io.IOException;
 
 @TeleOp(name = "Test - Constants Reader", group = "Test")
-public class ConstantsReaderTest extends OpMode {
+public class ConstantsReaderTest extends LinearOpMode {
 
-    @Override public void init() {
-        ConstantsLoader constantsLoader = new ConstantsLoader(telemetry);
+    @Override public void runOpMode() {
+       ConstantsLoader constantsLoader = new ConstantsLoader();
 
-        try {
-            constantsLoader.loadConstants();
-            telemetry.addData("Intake Power", INTAKE_POWER);
-            telemetry.addData("Worm Safety Voltage", WORM_SAFETY_VOLTAGE);
-        } catch (IOException exception) {
-            telemetry.addData("Failed to read from constants file", exception.getMessage());
-        }
+       waitForStart();
 
-        telemetry.update();
-    }
+       try {
+           constantsLoader.loadConstants();
+           telemetry.addData("INTAKE_POWER", INTAKE_POWER);
+           telemetry.addData("WORM_SAFETY_VOLTAGE", WORM_SAFETY_VOLTAGE);
+       } catch (IOException exception) {
+           telemetry.addData("Failed to load constants", exception.getMessage());
+       }
 
-    @Override public void loop() {
-        telemetry.addData("Intake Power", INTAKE_POWER);
+       telemetry.update();
+
+       sleep(1000);
+
+       terminateOpModeNow();
     }
 }

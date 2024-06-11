@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit.*;
-import static org.firstinspires.ftc.teamcode.Constants.IntakeConstants.*;
+import static org.firstinspires.ftc.teamcode.Constants.Constants.IntakeConstants.*;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 

@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Launcher.LauncherSubsystem;
 import org.firstinspires.ftc.teamcode.PlayStationController.Triggers.LeftGamepadTrigger;
 import org.firstinspires.ftc.teamcode.PlayStationController.Triggers.RightGamepadTrigger;
 
-import static org.firstinspires.ftc.teamcode.Constants.ArmConstants.*;
+import static org.firstinspires.ftc.teamcode.Constants.Constants.ArmConstants.*;
 
 @TeleOp(name = "TeleOpMain", group = "Test")
 public class TeleOpMain extends CommandOpMode {

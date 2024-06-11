@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-import static org.firstinspires.ftc.teamcode.Constants.HangerConstants.*;
+import static org.firstinspires.ftc.teamcode.Constants.Constants.HangerConstants.*;
 
 public class HangerSubsystem extends SubsystemBase {
     private final Servo hangerServo;

@@ -5,6 +5,7 @@ repositories {
 }
 
 dependencies {
+    // Standard Dependencies
     implementation 'org.firstinspires.ftc:Inspection:9.1.0'
     implementation 'org.firstinspires.ftc:Blocks:9.1.0'
     implementation 'org.firstinspires.ftc:Tfod:9.1.0'

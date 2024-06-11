@@ -1,36 +1,40 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Constants;
 
 import com.acmerobotics.dashboard.config.Config;
 
 /**
  * <h1>Constants Class</h1>
- *
- * <h2>Subsystem Nested Classes</h2>
  * <br>
+ * <h2>Compatibility with FTC dashboard and Constants File Loading</h2>
  * <p>
- *     Each subsystem declared in the Subsystems package has a corresponding nested class that
- *     contains the related values. Due to the way that the constants loader is implemented, any
- *     constants values that are outside of a nested class are ignored.
- * </p>
- * <br>
- * <h2>Constants Loader</h2>
- * <br>
- * <p>
-        The constants loader class loads constants from the files located in
-        /sdcard/FIRST/java/src/org/firstinspires/ftc/teamcode/Constants. each file located in the
-        aforementioned folder represent some group of constants (E.G Roadrunner, Arm Subsystem).
-        To assign a constants nested class a constants file in onbot java simply name the file
-        [Subsystem Name]Constants.txt. For example, to assign the nested IntakeConstants a file you
-        would name it IntakeConstants.txt. Any file that does not have a corresponding nested class
-        will be ignored, and any constants class without a corresponding file will default to the
-        values hardcoded into the class.
+ *     Each nested class should be wrapped with the {@link com.acmerobotics.dashboard.config.Config}
+ *     decorator so that they can be used with FTC dashboard.
  * </p>
  * <br>
  * <p>
- *     Note that the nested class doesn't have to represent a subsystem. It could also represent
- *     something more abstract such as vision or path following constants.
+ *     To be compatible with the {@link ConstantsLoader} class a
+ *     nested class must meet the following requirements.
+ *     <ul>
+ *         <li>The nested class must be suffixed with the word Constants</li>
+ *         <li>The nested class must have the same name as its corresponding onbot java file</li>
+ *     </ul>
+ *     Note that values labeled as final, private, or protected have their privacy/immutability
+ *     respected.
  * </p>
  * <br>
+ * <h2>Organization</h2>
+ * <br>
+ * <p>
+ *     The following organization guidelines are very general and there may be situations in which
+ *     they should be violated, at the end of the day you should use your own discretion when
+ *     determining how to organize the nested classes. However, some general guidelines are as
+ *     follows:
+ *     <ul>
+ *         <li>Each subsystem should have it's own nested class</li>
+ *         <li>Different aspects of auto should have their own nested classes</li>
+ *         <li>Device names should be private as to not be controllable via Onbot Java</li>
+ *     </ul>
+ * </p>
  */
 public class Constants {
 

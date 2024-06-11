@@ -12,7 +12,7 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.*;
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.*;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.*;
 
-import static org.firstinspires.ftc.teamcode.Constants.ArmConstants.*;
+import static org.firstinspires.ftc.teamcode.Constants.Constants.ArmConstants.*;
 import static org.firstinspires.ftc.teamcode.Subsystems.Arm.ArmHomingState.*;
 import static org.firstinspires.ftc.teamcode.Subsystems.Arm.ArmState.*;
 

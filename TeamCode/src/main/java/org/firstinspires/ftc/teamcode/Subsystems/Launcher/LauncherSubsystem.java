@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import static com.qualcomm.robotcore.hardware.Servo.Direction.*;
 
-import static org.firstinspires.ftc.teamcode.Constants.LauncherConstants.*;
+import static org.firstinspires.ftc.teamcode.Constants.Constants.LauncherConstants.*;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
