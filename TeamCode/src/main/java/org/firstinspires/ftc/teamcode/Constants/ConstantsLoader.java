@@ -54,8 +54,6 @@ public class ConstantsLoader {
         return constantsDirectory.listFiles();
     }
 
-
-
     @Nullable private Class<?> matchConstantsClassToConstantsFile(@NonNull String fileName) {
         for (Class<?> clazz : Constants.class.getDeclaredClasses()) {
             if (!Modifier.isStatic(clazz.getModifiers())) continue;
