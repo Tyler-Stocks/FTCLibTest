@@ -142,4 +142,12 @@ public class Constants {
        public static volatile Parameters IMU_PARAMETERS
                = new Parameters(IMU_ORIENTATION_ON_ROBOT);
     }
+
+    @Config
+    public static class PurplePixelPlacerConstants {
+        public static final String PURPLE_PIXEL_PLACER_SERVO_NAME = "purplePixelPlacerServo";
+
+        public static volatile double PURPLE_PIXEL_PLACER_NEUTRAL_POSITION = 1.0;
+        public static volatile double PURPLE_PIXEL_PLACER_ACTIVE_POSITION  = 0.0;
+    }
 }

@@ -21,6 +21,7 @@ import org.firstinspires.ftc.teamcode.PlayStationController.Triggers.RightGamepa
 import org.firstinspires.ftc.teamcode.Subsystems.MosaicFixers.Commands.RetractLeftMosaicFixerCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.MosaicFixers.Commands.RetractRightMosaicFixerCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.MosaicFixers.MosaicFixerSubsystem;
+import org.firstinspires.ftc.teamcode.Subsystems.PurplePixelPlacer.PurplePixelPlacerSubsystem;
 
 import static org.firstinspires.ftc.teamcode.Constants.Constants.ArmConstants.*;
 import static org.firstinspires.ftc.teamcode.Constants.Constants.IntakeConstants.*;
@@ -35,6 +36,8 @@ public class TeleOpMain extends CommandOpMode {
         ArmSubsystem         armSubsystem         = new ArmSubsystem(hardwareMap);
         DriveSubsystem       driveSubsystem       = new DriveSubsystem(hardwareMap);
         MosaicFixerSubsystem mosaicFixerSubsystem = new MosaicFixerSubsystem(hardwareMap);
+        PurplePixelPlacerSubsystem purplePixelPlacerSubsystem
+                = new PurplePixelPlacerSubsystem(hardwareMap);
 
         GamepadEx driverGamepad   = new GamepadEx(gamepad1);
         GamepadEx operatorGamepad = new GamepadEx(gamepad2);
@@ -92,7 +95,6 @@ public class TeleOpMain extends CommandOpMode {
                 .and(new Trigger(armSubsystem::isAtHome)) // Prevent intaking when we are not homed
                 .toggleWhenActive(intakeSubsystem::intake, intakeSubsystem::stop);
 
-
         new RightGamepadTrigger(OUTTAKE_TRIGGER_THRESHOLD, operatorGamepad)
                 .toggleWhenActive(intakeSubsystem::outtake, intakeSubsystem::stop);
 
@@ -125,11 +127,17 @@ public class TeleOpMain extends CommandOpMode {
         new GamepadButton(driverGamepad, DPAD_UP)
                 .whenPressed(mosaicFixerSubsystem::moveLeftMosaicFixerToHighPosition);
 
+        // ---------- Drive Commands (Gamepad 1) ---------- //
+
+        new GamepadButton(driverGamepad, OPTIONS)
+                .whenPressed(driveSubsystem::resetIMU);
+
         register(launcherSubsystem,
                  hangerSubsystem,
                  intakeSubsystem,
                  armSubsystem,
                  driveSubsystem,
-                 mosaicFixerSubsystem);
+                 mosaicFixerSubsystem,
+                 purplePixelPlacerSubsystem);
     }
 }

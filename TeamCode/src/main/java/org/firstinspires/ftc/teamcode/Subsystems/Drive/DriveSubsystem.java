@@ -24,20 +24,19 @@ public class DriveSubsystem extends SubsystemBase {
     private final IMU imu;
 
     public DriveSubsystem(@NonNull HardwareMap hardwareMap) {
-        frontLeftMotor
-                = hardwareMap.get(DcMotorImplEx.class, FRONT_LEFT_DRIVE_MOTOR_NAME);
-        frontRightMotor
-                = hardwareMap.get(DcMotorImplEx.class, FRONT_RIGHT_DRIVE_MOTOR_NAME);
-        backLeftMotor
-                = hardwareMap.get(DcMotorImplEx.class, BACK_LEFT_DRIVE_MOTOR_NAME);
-        backRightMotor
-                = hardwareMap.get(DcMotorImplEx.class, BACK_RIGHT_DRIVE_MOTOR_NAME);
+        frontLeftMotor  = hardwareMap.get(DcMotorImplEx.class, FRONT_LEFT_DRIVE_MOTOR_NAME);
+        frontRightMotor = hardwareMap.get(DcMotorImplEx.class, FRONT_RIGHT_DRIVE_MOTOR_NAME);
+        backLeftMotor   = hardwareMap.get(DcMotorImplEx.class, BACK_LEFT_DRIVE_MOTOR_NAME);
+        backRightMotor  = hardwareMap.get(DcMotorImplEx.class, BACK_RIGHT_DRIVE_MOTOR_NAME);
 
         imu = hardwareMap.get(IMU.class, IMU_NAME);
 
         imu.initialize(IMU_PARAMETERS);
 
-        MotorUtility.setDirections(REVERSE, frontLeftMotor, frontRightMotor);
+        frontLeftMotor.setDirection(FRONT_LEFT_DRIVE_MOTOR_DIRECTION);
+        frontRightMotor.setDirection(FRONT_RIGHT_DRIVE_MOTOR_DIRECTION);
+        backLeftMotor.setDirection(BACK_LEFT_DRIVE_MOTOR_DIRECTION);
+        backRightMotor.setDirection(BACK_RIGHT_DRIVE_MOTOR_DIRECTION);
 
         MotorUtility.setMotorZeroPowerBehaviors(
                 BRAKE, frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
