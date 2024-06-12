@@ -11,26 +11,46 @@ import static org.firstinspires.ftc.teamcode.PlayStationController.PlayStationCo
 import org.firstinspires.ftc.teamcode.Subsystems.Arm.ArmSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.Arm.Commands.SetArmTargetPositionCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.Arm.Triggers.ArmIsOutsideFrameTrigger;
+import org.firstinspires.ftc.teamcode.Subsystems.Drive.Commands.DriveRobotCentricCommand;
+import org.firstinspires.ftc.teamcode.Subsystems.Drive.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.Hanger.HangerSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher.LauncherSubsystem;
 import org.firstinspires.ftc.teamcode.PlayStationController.Triggers.LeftGamepadTrigger;
 import org.firstinspires.ftc.teamcode.PlayStationController.Triggers.RightGamepadTrigger;
+import org.firstinspires.ftc.teamcode.Subsystems.MosaicFixers.Commands.RetractLeftMosaicFixerCommand;
+import org.firstinspires.ftc.teamcode.Subsystems.MosaicFixers.Commands.RetractRightMosaicFixerCommand;
+import org.firstinspires.ftc.teamcode.Subsystems.MosaicFixers.MosaicFixerSubsystem;
 
 import static org.firstinspires.ftc.teamcode.Constants.Constants.ArmConstants.*;
+import static org.firstinspires.ftc.teamcode.Constants.Constants.IntakeConstants.*;
 
 @TeleOp(name = "TeleOpMain", group = "Test")
 public class TeleOpMain extends CommandOpMode {
 
     @Override public void initialize() {
-        LauncherSubsystem launcherSubsystem = new LauncherSubsystem(hardwareMap);
-        HangerSubsystem   hangerSubsystem   = new HangerSubsystem(hardwareMap);
-        IntakeSubsystem   intakeSubsystem   = new IntakeSubsystem(hardwareMap);
-        ArmSubsystem      armSubsystem      = new ArmSubsystem(hardwareMap);
+        LauncherSubsystem    launcherSubsystem    = new LauncherSubsystem(hardwareMap);
+        HangerSubsystem      hangerSubsystem      = new HangerSubsystem(hardwareMap);
+        IntakeSubsystem      intakeSubsystem      = new IntakeSubsystem(hardwareMap);
+        ArmSubsystem         armSubsystem         = new ArmSubsystem(hardwareMap);
+        DriveSubsystem       driveSubsystem       = new DriveSubsystem(hardwareMap);
+        MosaicFixerSubsystem mosaicFixerSubsystem = new MosaicFixerSubsystem(hardwareMap);
 
-        GamepadEx operatorGamepad = new GamepadEx(gamepad1);
+        GamepadEx driverGamepad   = new GamepadEx(gamepad1);
+        GamepadEx operatorGamepad = new GamepadEx(gamepad2);
 
-        // Arm Triggers
+        driveSubsystem.setDefaultCommand(
+                new DriveRobotCentricCommand(
+                        driveSubsystem,
+                        driverGamepad::getLeftY,
+                        driverGamepad::getLeftX,
+                        driverGamepad::getRightX
+                )
+        );
+
+        // -------------------- Conditional Triggers -------------------- //
+
+        // ---------- Arm Triggers (Gamepad 2) ---------- //
 
         new GamepadButton(operatorGamepad, DPAD_DOWN)
                 .whenPressed(new SetArmTargetPositionCommand(
@@ -56,25 +76,60 @@ public class TeleOpMain extends CommandOpMode {
                 .whenPressed(new SetArmTargetPositionCommand(
                         armSubsystem, TOP_WORM_POSITION, TOP_ELEVATOR_POSITION), true);
 
-        // Left outtake door trigger
+        // ---------- Outtake Triggers (Gamepad 2) ---------- //
+
         new GamepadButton(operatorGamepad, LEFT_BUMPER)
                 .and(new ArmIsOutsideFrameTrigger(armSubsystem))
                 .toggleWhenActive(armSubsystem::openLeftOuttakeDoor, armSubsystem::closeLeftOuttakeDoor);
 
-        // Right outtake door trigger
         new GamepadButton(operatorGamepad, RIGHT_BUMPER)
                 .and(new ArmIsOutsideFrameTrigger(armSubsystem))
                 .toggleWhenActive(armSubsystem::openRightOuttakeDoor, armSubsystem::closeRightOuttakeDoor);
 
-        // Intake Trigger
-        new LeftGamepadTrigger(0.2, operatorGamepad)
-                .and(new Trigger(armSubsystem::isAtHome))
+        // ---------- Intake Triggers (Gamepad 2) ---------- //
+
+        new LeftGamepadTrigger(INTAKE_TRIGGER_THRESHOLD, operatorGamepad)
+                .and(new Trigger(armSubsystem::isAtHome)) // Prevent intaking when we are not homed
                 .toggleWhenActive(intakeSubsystem::intake, intakeSubsystem::stop);
 
-        // Outtake Trigger
-        new RightGamepadTrigger(0.2, operatorGamepad)
+
+        new RightGamepadTrigger(OUTTAKE_TRIGGER_THRESHOLD, operatorGamepad)
                 .toggleWhenActive(intakeSubsystem::outtake, intakeSubsystem::stop);
 
-        register(launcherSubsystem, hangerSubsystem, intakeSubsystem, armSubsystem);
+        // ---------- Mosaic Fixer Triggers (Gamepad 1) ---------- //
+
+        new GamepadButton(driverGamepad, LEFT_BUMPER)
+                .whenPressed(mosaicFixerSubsystem::disableLeftMosaicFixer);
+
+        new GamepadButton(driverGamepad, RIGHT_BUMPER)
+                .whenPressed(mosaicFixerSubsystem::disableRightMosaicFixer);
+
+        new GamepadButton(driverGamepad, CROSS)
+                .whenPressed(new RetractRightMosaicFixerCommand(mosaicFixerSubsystem));
+
+        new GamepadButton(driverGamepad, SQUARE)
+                .whenPressed(mosaicFixerSubsystem::moveRightMosaicFixerToLowPosition);
+
+        new GamepadButton(driverGamepad, TRIANGLE)
+                .whenPressed(mosaicFixerSubsystem::moveRightMosaicFixerToMediumPosition);
+
+        new GamepadButton(driverGamepad, DPAD_DOWN)
+                .whenPressed(new RetractLeftMosaicFixerCommand(mosaicFixerSubsystem));
+
+        new GamepadButton(driverGamepad, DPAD_LEFT)
+                .whenPressed(mosaicFixerSubsystem::moveLeftMosaicFixerToLowPosition);
+
+        new GamepadButton(driverGamepad, DPAD_RIGHT)
+                .whenPressed(mosaicFixerSubsystem::moveLeftMosaicFixerToMediumPosition);
+
+        new GamepadButton(driverGamepad, DPAD_UP)
+                .whenPressed(mosaicFixerSubsystem::moveLeftMosaicFixerToHighPosition);
+
+        register(launcherSubsystem,
+                 hangerSubsystem,
+                 intakeSubsystem,
+                 armSubsystem,
+                 driveSubsystem,
+                 mosaicFixerSubsystem);
     }
 }

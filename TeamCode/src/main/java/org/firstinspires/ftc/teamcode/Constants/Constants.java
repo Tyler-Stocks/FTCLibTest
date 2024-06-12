@@ -1,6 +1,16 @@
 package org.firstinspires.ftc.teamcode.Constants;
 
+
+import static com.qualcomm.hardware.rev.RevHubOrientationOnRobot.LogoFacingDirection.*;
+import static com.qualcomm.hardware.rev.RevHubOrientationOnRobot.UsbFacingDirection.UP;
+import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.*;
+import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
+
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
+import com.qualcomm.robotcore.hardware.IMU.Parameters;
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot.LogoFacingDirection;
+import com.qualcomm.hardware.rev.RevHubOrientationOnRobot.UsbFacingDirection;
 
 /**
  * <h1>Constants Class</h1>
@@ -60,8 +70,10 @@ public class Constants {
         public static final String FRONT_BEAM_BREAK_NAME = "frontBeamBreak";
         public static final String BACK_BEAM_BREAK_NAME  = "backBeamBreak";
 
-        public static volatile double INTAKE_POWER  = 1.0;
-        public static volatile double OUTTAKE_POWER = 0.4;
+        public static volatile double INTAKE_POWER              = 1.0;
+        public static volatile double OUTTAKE_POWER             = 0.4;
+        public static volatile double INTAKE_TRIGGER_THRESHOLD  = 0.2;
+        public static volatile double OUTTAKE_TRIGGER_THRESHOLD = 0.2;
     }
 
     @Config
@@ -102,5 +114,32 @@ public class Constants {
 
         public static volatile double OUTTAKE_DOOR_OPEN_POSITION   = 0.25;
         public static volatile double OUTTAKE_DOOR_CLOSED_POSITION = 0.0;
+    }
+
+    @Config
+    public static class DrivebaseConstants {
+       public static final String FRONT_LEFT_DRIVE_MOTOR_NAME  = "frontLeftDriveMotor";
+       public static final String FRONT_RIGHT_DRIVE_MOTOR_NAME = "frontRightDriveMotor";
+       public static final String BACK_LEFT_DRIVE_MOTOR_NAME   = "backLeftDriveMotor";
+       public static final String BACK_RIGHT_DRIVE_MOTOR_NAME  = "backRightDriveMotor";
+       public static final String IMU_NAME                     = "imu";
+
+       public static volatile Direction FRONT_LEFT_DRIVE_MOTOR_DIRECTION  = REVERSE;
+       public static volatile Direction FRONT_RIGHT_DRIVE_MOTOR_DIRECTION = Direction.FORWARD;
+       public static volatile Direction BACK_LEFT_DRIVE_MOTOR_DIRECTION   = REVERSE;
+       public static volatile Direction BACK_RIGHT_DRIVE_MOTOR_DIRECTION  = Direction.FORWARD;
+
+       public static volatile double DRIVE_DEAD_ZONE  = 0.05;
+       public static volatile double STRAFE_DEAD_ZONE = 0.05;
+       public static volatile double TURN_DEAD_ZONE   = 0.05;
+
+       // ----- IMU Parameters ----- //
+       private static volatile UsbFacingDirection IMU_USB_DIRECTION   = UP;
+       private static volatile LogoFacingDirection IMU_LOGO_DIRECTION = RIGHT;
+
+       private static volatile RevHubOrientationOnRobot IMU_ORIENTATION_ON_ROBOT
+               = new RevHubOrientationOnRobot(IMU_LOGO_DIRECTION, IMU_USB_DIRECTION);
+       public static volatile Parameters IMU_PARAMETERS
+               = new Parameters(IMU_ORIENTATION_ON_ROBOT);
     }
 }
