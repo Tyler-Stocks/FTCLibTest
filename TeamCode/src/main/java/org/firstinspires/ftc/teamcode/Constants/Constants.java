@@ -153,4 +153,19 @@ public class Constants {
         public static volatile double PURPLE_PIXEL_PLACER_NEUTRAL_POSITION = 1.0;
         public static volatile double PURPLE_PIXEL_PLACER_ACTIVE_POSITION  = 0.0;
     }
+
+    @Config
+    public static class MosaicFixerConstants {
+        public static final String MOSAIC_FIXER_SERVO_LEFT_NAME  = "leftMosaicFixerServo";
+        public static final String MOSAIC_FIXER_SERVO_RIGHT_NAME = "rightMosaicFixerServo";
+
+        public static volatile double MOSAIC_FIXER_LEFT_HOME_POSITION   = 0.0;
+        public static volatile double MOSAIC_FIXER_LEFT_LOW_POSITION    = 0.62;
+        public static volatile double MOSAIC_FIXER_LEFT_MEDIUM_POSITION = 0.59;
+        public static volatile double MOSAIC_FIXER_LEFT_HIGH_POSITION   = 0.54;
+
+        public static volatile double MOSAIC_FIXER_RIGHT_HOME_POSITION = 0.0;
+        public static volatile double MOSAIC_FIXER_RIGHT_LOW_POSITION  = 0.61;
+        public static volatile double MOSAIC_FIXER_RIGHT_HIGH_POSITION = 0.55;
+    }
 }

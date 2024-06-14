@@ -72,7 +72,7 @@ public class ArmSubsystem extends SubsystemBase {
         elevatorPower = DEFAULT_ELEVATOR_POWER;
         wormPower     = DEFAULT_WORM_POWER;
 
-        openOuttake();
+        closeOuttake();
 
         armState       = ArmState.UNKNOWN;
         armHomingState = START;

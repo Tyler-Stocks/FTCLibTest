@@ -7,15 +7,17 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 import static com.qualcomm.robotcore.hardware.Servo.Direction.*;
 
+import static org.firstinspires.ftc.teamcode.Constants.Constants.MosaicFixerConstants.*;
+
 public class MosaicFixerSubsystem extends SubsystemBase {
     private final ServoImplEx leftMosaicFixerServo,
                               rightMosaicFixerServo;
 
     public MosaicFixerSubsystem(@NonNull HardwareMap hardwareMap) {
         leftMosaicFixerServo
-                = hardwareMap.get(ServoImplEx.class, "leftMosaicFixerServo");
+                = hardwareMap.get(ServoImplEx.class, MOSAIC_FIXER_SERVO_LEFT_NAME);
         rightMosaicFixerServo
-                = hardwareMap.get(ServoImplEx.class, "rightMosaicFixerServo");
+                = hardwareMap.get(ServoImplEx.class, MOSAIC_FIXER_SERVO_RIGHT_NAME);
 
         leftMosaicFixerServo.setDirection(REVERSE);
 
@@ -41,30 +43,30 @@ public class MosaicFixerSubsystem extends SubsystemBase {
     }
 
     public void moveLeftMosaicFixerToLowPosition() {
-        leftMosaicFixerServo.setPosition(0.62);
+        leftMosaicFixerServo.setPosition(MOSAIC_FIXER_LEFT_LOW_POSITION);
     }
 
     public void moveLeftMosaicFixerToMediumPosition() {
-        leftMosaicFixerServo.setPosition(0.59);
+        leftMosaicFixerServo.setPosition(MOSAIC_FIXER_LEFT_MEDIUM_POSITION);
     }
 
     public void moveLeftMosaicFixerToHighPosition() {
-        leftMosaicFixerServo.setPosition(0.54);
+        leftMosaicFixerServo.setPosition(MOSAIC_FIXER_LEFT_HIGH_POSITION);
     }
 
     public void moveRightMosaicFixerToLowPosition() {
-        rightMosaicFixerServo.setPosition(0.61);
+        rightMosaicFixerServo.setPosition(MOSAIC_FIXER_RIGHT_LOW_POSITION);
     }
 
-    public void moveRightMosaicFixerToMediumPosition() {
-        rightMosaicFixerServo.setPosition(0.55);
+    public void moveRightMosaicFixerToHighPosition() {
+        rightMosaicFixerServo.setPosition(MOSAIC_FIXER_RIGHT_HIGH_POSITION);
     }
 
     public void retractMosaicFixerLeft() {
-        leftMosaicFixerServo.setPosition(0.0);
+        leftMosaicFixerServo.setPosition(MOSAIC_FIXER_LEFT_HOME_POSITION);
     }
 
     public void retractMosaicFixerRight() {
-        rightMosaicFixerServo.setPosition(0.0);
+        rightMosaicFixerServo.setPosition(MOSAIC_FIXER_RIGHT_HOME_POSITION);
     }
 }

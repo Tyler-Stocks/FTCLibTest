@@ -13,7 +13,7 @@ public class PurplePixelPlacerSubsystem extends SubsystemBase {
 
     public PurplePixelPlacerSubsystem(@NonNull HardwareMap hardwareMap) {
        purplePixelPlacerServo
-               = hardwareMap.get(ServoImplEx.class, "purplePixelPlacerServo");
+               = hardwareMap.get(ServoImplEx.class, PURPLE_PIXEL_PLACER_SERVO_NAME);
 
        moveToNeutralPosition();
     }

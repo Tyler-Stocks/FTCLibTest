@@ -136,7 +136,7 @@ public class TeleOpMain extends CommandOpMode {
                 .whenPressed(mosaicFixerSubsystem::moveRightMosaicFixerToLowPosition);
 
         new GamepadButton(driverGamepad, TRIANGLE)
-                .whenPressed(mosaicFixerSubsystem::moveRightMosaicFixerToMediumPosition);
+                .whenPressed(mosaicFixerSubsystem::moveRightMosaicFixerToHighPosition);
 
         new GamepadButton(driverGamepad, DPAD_DOWN)
                 .whenPressed(new RetractLeftMosaicFixerCommand(mosaicFixerSubsystem));
