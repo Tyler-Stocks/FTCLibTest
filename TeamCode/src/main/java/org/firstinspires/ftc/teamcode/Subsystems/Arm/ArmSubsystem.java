@@ -291,4 +291,48 @@ public class ArmSubsystem extends SubsystemBase {
         return elevatorMotor.getCurrentPosition() <= ELEVATOR_FRAME_LIMIT
                 && wormMotor.getCurrentPosition() <= WORM_FRAME_LIMIT;
     }
+
+    /**
+     * @return The current position of the motor
+     */
+    public int wormPosition() {
+        return wormMotor.getCurrentPosition();
+    }
+
+    /**
+     * @return The target position of the motor reported by wormMotor.getTargetPosition()
+     */
+    public int wormTargetPosition() {
+        return wormMotor.getTargetPosition();
+    }
+
+    /**
+     * @return The local target position of the worm motor obtained through the local variable
+     * wormMotorTargetPosition
+     */
+    public int localWormTargetPosition() {
+        return wormTargetPosition;
+    }
+
+    /**
+     * @return The current position of the elevator motor
+     */
+    public int elevatorPosition() {
+        return elevatorMotor.getCurrentPosition();
+    }
+
+    /**
+     * @return The target position of the elevator as reported by elevatorMotor.getTargetPosition()
+     */
+    public int elevatorTargetPosition() {
+        return elevatorMotor.getTargetPosition();
+    }
+
+    /**
+     * @return The local target position of the elevator motor obtained through the local variable
+     * elevatorTargetPosition
+     */
+    public int localElevatorTargetPosition() {
+        return elevatorTargetPosition;
+    }
 }

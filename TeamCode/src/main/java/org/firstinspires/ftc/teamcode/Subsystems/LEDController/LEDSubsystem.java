@@ -6,7 +6,9 @@ import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.LED;
 
-public class LEDControllerSubsystem extends SubsystemBase {
+import static org.firstinspires.ftc.teamcode.Subsystems.LEDController.LEDState.*;
+
+public class LEDSubsystem extends SubsystemBase {
     private final LED leftLEDRedChannel,
                       leftLEDGreenChannel,
                       rightLEDRedChannel,
@@ -15,14 +17,8 @@ public class LEDControllerSubsystem extends SubsystemBase {
     private LEDState leftLEDState,
                      rightLEDState;
 
-    public enum LEDState {
-        RED,
-        GREEN,
-        AMBER,
-        OFF
-    }
 
-    public LEDControllerSubsystem(@NonNull HardwareMap hardwareMap) {
+    public LEDSubsystem(@NonNull HardwareMap hardwareMap) {
         leftLEDRedChannel    = hardwareMap.get(LED.class, "leftLEDRedChannel");
         leftLEDGreenChannel  = hardwareMap.get(LED.class, "leftLEDGreenChannel");
         rightLEDRedChannel   = hardwareMap.get(LED.class, "rightLEDRedChannel");
@@ -32,6 +28,9 @@ public class LEDControllerSubsystem extends SubsystemBase {
         leftLEDGreenChannel.enable(false);
         rightLEDRedChannel.enable(false);
         rightLEDGreenChannel.enable(false);
+
+        leftLEDState  = OFF;
+        rightLEDState = OFF;
     }
 
     @Override public void periodic() {
@@ -74,11 +73,27 @@ public class LEDControllerSubsystem extends SubsystemBase {
         }
     }
 
-    public void setLeftLEDState(@NonNull LEDState leftLEDState) {
-        this.leftLEDState = leftLEDState;
+    public void setLeftLEDGreen() {
+        leftLEDState = GREEN;
     }
 
-    public void setRightLEDState(@NonNull LEDState rightLEDState) {
-        this.rightLEDState = rightLEDState;
+    public void setLeftLEDRed() {
+        leftLEDState = RED;
+    }
+
+    public void turnLeftLEDOff() {
+        leftLEDState = OFF;
+    }
+
+    public void setRightLEDGreen() {
+        rightLEDState = GREEN;
+    }
+
+    public void setRightLEDRed() {
+        rightLEDState = RED;
+    }
+
+    public void setRightLEDOff() {
+        rightLEDState = OFF;
     }
 }

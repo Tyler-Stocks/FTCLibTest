@@ -96,7 +96,7 @@ public class Constants {
 
         public static volatile int WORM_SAFETY_LIMIT     = 700;
         public static volatile int MAX_ELEVATOR_POSITION = 2750;
-        public static volatile int MAX_WORM_POSITION     = 2200;
+        public static volatile int MAX_WORM_POSITION     = 2500;
 
         public static volatile int BOTTOM_ELEVATOR_POSITION  = 1580;
         public static volatile int BOTTOM_WORM_POSITION      = 1250;
@@ -108,6 +108,9 @@ public class Constants {
         public static volatile int HIGH_WORM_POSITION        = 1822;
         public static volatile int TOP_ELEVATOR_POSITION     = 2667;
         public static volatile int TOP_WORM_POSITION         = 1909;
+
+        public static volatile int HANGING_WORM_POSITION   = 2500;
+        public static volatile int LAUNCHING_WORM_POSITION = 1600;
 
         public static volatile int WORM_FRAME_LIMIT     = 500;
         public static volatile int ELEVATOR_FRAME_LIMIT = 500;

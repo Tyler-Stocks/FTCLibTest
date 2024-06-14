@@ -15,6 +15,9 @@ import org.firstinspires.ftc.teamcode.Subsystems.Drive.Commands.DriveRobotCentri
 import org.firstinspires.ftc.teamcode.Subsystems.Drive.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.Hanger.HangerSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake.IntakeSubsystem;
+import org.firstinspires.ftc.teamcode.Subsystems.Intake.Triggers.BackBeamBreakTrigger;
+import org.firstinspires.ftc.teamcode.Subsystems.Intake.Triggers.FrontBeamBreakTrigger;
+import org.firstinspires.ftc.teamcode.Subsystems.LEDController.LEDSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher.LauncherSubsystem;
 import org.firstinspires.ftc.teamcode.PlayStationController.Triggers.LeftGamepadTrigger;
 import org.firstinspires.ftc.teamcode.PlayStationController.Triggers.RightGamepadTrigger;
@@ -26,16 +29,28 @@ import org.firstinspires.ftc.teamcode.Subsystems.PurplePixelPlacer.PurplePixelPl
 import static org.firstinspires.ftc.teamcode.Constants.Constants.ArmConstants.*;
 import static org.firstinspires.ftc.teamcode.Constants.Constants.IntakeConstants.*;
 
+import static org.firstinspires.ftc.teamcode.OpModes.TeleOpMain.GameState.*;
+
 @TeleOp(name = "TeleOpMain", group = "Test")
 public class TeleOpMain extends CommandOpMode {
 
+    protected enum GameState {
+        TELEOP,
+        ENDGAME
+    }
+
+    private GameState gameState;
+
     @Override public void initialize() {
-        LauncherSubsystem    launcherSubsystem    = new LauncherSubsystem(hardwareMap);
-        HangerSubsystem      hangerSubsystem      = new HangerSubsystem(hardwareMap);
-        IntakeSubsystem      intakeSubsystem      = new IntakeSubsystem(hardwareMap);
-        ArmSubsystem         armSubsystem         = new ArmSubsystem(hardwareMap);
-        DriveSubsystem       driveSubsystem       = new DriveSubsystem(hardwareMap);
-        MosaicFixerSubsystem mosaicFixerSubsystem = new MosaicFixerSubsystem(hardwareMap);
+        gameState = TELEOP;
+
+        LauncherSubsystem    launcherSubsystem      = new LauncherSubsystem(hardwareMap);
+        HangerSubsystem      hangerSubsystem        = new HangerSubsystem(hardwareMap);
+        IntakeSubsystem      intakeSubsystem        = new IntakeSubsystem(hardwareMap);
+        ArmSubsystem         armSubsystem           = new ArmSubsystem(hardwareMap);
+        DriveSubsystem       driveSubsystem         = new DriveSubsystem(hardwareMap);
+        MosaicFixerSubsystem mosaicFixerSubsystem   = new MosaicFixerSubsystem(hardwareMap);
+        LEDSubsystem         ledSubsystem = new LEDSubsystem(hardwareMap);
         PurplePixelPlacerSubsystem purplePixelPlacerSubsystem
                 = new PurplePixelPlacerSubsystem(hardwareMap);
 
@@ -51,9 +66,7 @@ public class TeleOpMain extends CommandOpMode {
                 )
         );
 
-        // -------------------- Conditional Triggers -------------------- //
-
-        // ---------- Arm Triggers (Gamepad 2) ---------- //
+        // ---------- Arm Triggers (Controlled by operator) ---------- //
 
         new GamepadButton(operatorGamepad, DPAD_DOWN)
                 .whenPressed(new SetArmTargetPositionCommand(
@@ -79,7 +92,17 @@ public class TeleOpMain extends CommandOpMode {
                 .whenPressed(new SetArmTargetPositionCommand(
                         armSubsystem, TOP_WORM_POSITION, TOP_ELEVATOR_POSITION), true);
 
-        // ---------- Outtake Triggers (Gamepad 2) ---------- //
+        new GamepadButton(operatorGamepad, LEFT_BUMPER)
+                .and(new Trigger(this::isInEndgame))
+                .whenActive(new SetArmTargetPositionCommand(
+                        armSubsystem, HANGING_WORM_POSITION, 0), true);
+
+        new GamepadButton(operatorGamepad, RIGHT_BUMPER)
+                .and(new Trigger(this::isInEndgame))
+                .whenActive(new SetArmTargetPositionCommand(
+                        armSubsystem, LAUNCHING_WORM_POSITION, 0), true);
+
+        // ---------- Outtake Triggers (Controlled By Operator) ---------- //
 
         new GamepadButton(operatorGamepad, LEFT_BUMPER)
                 .and(new ArmIsOutsideFrameTrigger(armSubsystem))
@@ -89,7 +112,7 @@ public class TeleOpMain extends CommandOpMode {
                 .and(new ArmIsOutsideFrameTrigger(armSubsystem))
                 .toggleWhenActive(armSubsystem::openRightOuttakeDoor, armSubsystem::closeRightOuttakeDoor);
 
-        // ---------- Intake Triggers (Gamepad 2) ---------- //
+        // ---------- Intake Triggers (Controlled By Operator) ---------- //
 
         new LeftGamepadTrigger(INTAKE_TRIGGER_THRESHOLD, operatorGamepad)
                 .and(new Trigger(armSubsystem::isAtHome)) // Prevent intaking when we are not homed
@@ -98,7 +121,7 @@ public class TeleOpMain extends CommandOpMode {
         new RightGamepadTrigger(OUTTAKE_TRIGGER_THRESHOLD, operatorGamepad)
                 .toggleWhenActive(intakeSubsystem::outtake, intakeSubsystem::stop);
 
-        // ---------- Mosaic Fixer Triggers (Gamepad 1) ---------- //
+        // ---------- Mosaic Fixer Triggers (Controlled By Driver) ---------- //
 
         new GamepadButton(driverGamepad, LEFT_BUMPER)
                 .whenPressed(mosaicFixerSubsystem::disableLeftMosaicFixer);
@@ -127,10 +150,23 @@ public class TeleOpMain extends CommandOpMode {
         new GamepadButton(driverGamepad, DPAD_UP)
                 .whenPressed(mosaicFixerSubsystem::moveLeftMosaicFixerToHighPosition);
 
-        // ---------- Drive Commands (Gamepad 1) ---------- //
+        // ---------- Drive Commands (Controlled By Driver) ---------- //
 
         new GamepadButton(driverGamepad, OPTIONS)
                 .whenPressed(driveSubsystem::resetIMU);
+
+        // ---------- LED Triggers (Automatic) ---------- //
+
+        new FrontBeamBreakTrigger(intakeSubsystem)
+                .toggleWhenActive(ledSubsystem::setLeftLEDRed, ledSubsystem::setLeftLEDGreen);
+
+        new BackBeamBreakTrigger(intakeSubsystem)
+                .toggleWhenActive(ledSubsystem::setRightLEDRed, ledSubsystem::setRightLEDGreen);
+
+        // ---------- End Game Trigger ---------- //
+
+        new GamepadButton(operatorGamepad, OPTIONS)
+                .whenPressed(this::toggleGameState);
 
         register(launcherSubsystem,
                  hangerSubsystem,
@@ -139,5 +175,24 @@ public class TeleOpMain extends CommandOpMode {
                  driveSubsystem,
                  mosaicFixerSubsystem,
                  purplePixelPlacerSubsystem);
+    }
+
+    private void toggleGameState() {
+       switch (gameState) {
+           case TELEOP:
+               gameState = ENDGAME;
+               break;
+           case ENDGAME:
+               gameState = TELEOP;
+               break;
+       }
+    }
+
+    private boolean isInEndgame() {
+        return gameState == ENDGAME;
+    }
+
+    private boolean isInTeleOp() {
+        return gameState == TELEOP;
     }
 }

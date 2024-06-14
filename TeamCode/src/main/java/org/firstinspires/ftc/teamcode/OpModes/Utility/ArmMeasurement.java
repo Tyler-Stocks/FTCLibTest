@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.OpModes.Utility;
 
+import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -7,32 +8,17 @@ import com.qualcomm.robotcore.hardware.DcMotorImplEx;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.*;
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.*;
 
+import org.firstinspires.ftc.teamcode.Subsystems.Arm.ArmSubsystem;
+import org.firstinspires.ftc.teamcode.Subsystems.Arm.Commands.DisplayArmPositionTelemetry;
+
 @TeleOp(name = "Utility - Arm Measurement", group = "Utility")
-public class ArmMeasurement extends OpMode {
-    private static DcMotorImplEx wormMotor, elevatorMotor;
+public class ArmMeasurement extends CommandOpMode {
 
-    private static boolean brake = false;
+    @Override public void initialize() {
+        ArmSubsystem armSubsystem = new ArmSubsystem(hardwareMap);
 
-    @Override public void init() {
-        wormMotor     = hardwareMap.get(DcMotorImplEx.class, "WormMotor");
-        elevatorMotor = hardwareMap.get(DcMotorImplEx.class, "ElevatorMotor");
+        armSubsystem.setDefaultCommand(new DisplayArmPositionTelemetry(armSubsystem, telemetry));
 
-        elevatorMotor.setDirection(REVERSE);
-    }
-
-    @Override public void loop() {
-        if (brake) {
-            wormMotor.setZeroPowerBehavior(BRAKE);
-            elevatorMotor.setZeroPowerBehavior(BRAKE);
-        } else {
-            wormMotor.setZeroPowerBehavior(FLOAT);
-            elevatorMotor.setZeroPowerBehavior(FLOAT);
-        }
-
-        telemetry.addLine("Press Options to toggle between brake and float");
-        telemetry.addData("Elevator Position", elevatorMotor.getCurrentPosition());
-        telemetry.addData("Worm Position", wormMotor.getCurrentPosition());
-
-        if (gamepad1.options || gamepad2.options) brake = !brake;
+        register(armSubsystem);
     }
 }
