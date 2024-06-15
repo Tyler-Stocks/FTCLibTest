@@ -16,6 +16,8 @@ import static org.firstinspires.ftc.teamcode.Constants.Constants.ArmConstants.*;
 import static org.firstinspires.ftc.teamcode.Subsystems.Arm.ArmHomingState.*;
 import static org.firstinspires.ftc.teamcode.Subsystems.Arm.ArmState.*;
 
+import org.firstinspires.ftc.teamcode.Subsystems.Utility.MotorUtility;
+
 public class ArmSubsystem extends SubsystemBase {
     private ArmHomingState armHomingState;
     private ArmState armState;
@@ -86,18 +88,18 @@ public class ArmSubsystem extends SubsystemBase {
                 if (elevatorTargetPosition == 0 && wormTargetPosition == 0) {
                     elevatorMotor.setPower(0.0);
                 } else {
-                    elevatorMotor.setPower(0.001);
+                    elevatorMotor.setPower(ELEVATOR_INTAKE_HOLDING_POWER);
                 }
                 break;
             case TO_POSITION:
                 if (elevatorTargetPosition == 0 && wormTargetPosition == 0) {
 
-                    if (wormMotor.getCurrentPosition() > WORM_SAFETY_LIMIT && elevatorMotor.getCurrentPosition() > 40) {
+                    if (wormMotor.getCurrentPosition() > WORM_SAFETY_LIMIT && elevatorMotor.getCurrentPosition() > 10) {
                         extendElevator(0, elevatorPower);
                     }
 
                     else if (wormMotor.getCurrentPosition() < WORM_SAFETY_LIMIT && elevatorMotor.getCurrentPosition() > 900) {
-                        rotateWorm(WORM_SAFETY_LIMIT + 20, wormPower);
+                        rotateWorm(WORM_SAFETY_THRESHOLD, wormPower);
                         extendElevator(1000);
 
                     } else if (90 < elevatorMotor.getCurrentPosition() && elevatorMotor.getCurrentPosition() < 900) {
@@ -115,36 +117,25 @@ public class ArmSubsystem extends SubsystemBase {
                         extendElevator(elevatorTargetPosition, elevatorPower);
                     }
                 }
-                if (wormMotor.getTargetPosition()== wormTargetPosition && elevatorMotor.getTargetPosition()== elevatorTargetPosition&&
-                        !elevatorMotor.isBusy() && !wormMotor.isBusy()) {
 
-                    armState = AT_POSITION;
-                }
+                if (isAtPosition()) armState = AT_POSITION;
+
                 break;
-            // If we don't know what the current state of the robot is we need to home.
-            // This is mostly used at the beginning of TeleOp because we don't know what the state
-            // of the arm is. It is also useful to automatically home after an unexpected robot
-            // disconnect
             case UNKNOWN:
                 setHoming();
                 break;
-            // Homing sequence should only be called when the arm state is homing
             case HOMING:
                 home();
                 break;
         }
     }
 
-    /**
-     * Homes the arm and worm. First, it homes the elevator, then the worm after it is finished
-     */
     private void home() {
         switch (armHomingState) {
             case START:
-                openOuttake(); // Make sure the tray is closed so we don't break it
+                closeOuttake(); // Make sure the outtake is closed so we don't break it
 
-                wormMotor.setMode(RUN_USING_ENCODER);
-                elevatorMotor.setMode(RUN_USING_ENCODER);
+                MotorUtility.setRunModes(RUN_USING_ENCODER, wormMotor, elevatorMotor);
 
                 // If the worm power is greater than the safety voltage, start homing the elevator
                 if (wormPotentiometer.getVoltage() >= WORM_SAFETY_VOLTAGE) {
@@ -193,13 +184,11 @@ public class ArmSubsystem extends SubsystemBase {
                 }
                 break;
             case COMPLETE:
-                wormMotor.setMode(STOP_AND_RESET_ENCODER);
-                elevatorMotor.setMode(STOP_AND_RESET_ENCODER);
-                wormMotor.setMode(RUN_USING_ENCODER);
-                elevatorMotor.setMode(RUN_USING_ENCODER);
+                MotorUtility.setRunModes(STOP_AND_RESET_ENCODER, wormMotor, elevatorMotor);
+                MotorUtility.setRunModes(RUN_USING_ENCODER, wormMotor, elevatorMotor);
 
-                armState      = AT_POSITION;
-                armHomingState= IDLE;
+                armState       = AT_POSITION;
+                armHomingState = IDLE;
 
                 elevatorTargetPosition = 0;
                 wormTargetPosition     = 0;
@@ -209,27 +198,45 @@ public class ArmSubsystem extends SubsystemBase {
         }
     }
 
+    /**
+     * Opens both outtake doors
+     */
     public void openOuttake() {
         leftOuttakeServo.setPosition(OUTTAKE_DOOR_OPEN_POSITION);
         rightOuttakeServo.setPosition(OUTTAKE_DOOR_OPEN_POSITION);
     }
 
+    /**
+     * Opens the left outtake door
+     */
     public void openLeftOuttakeDoor() {
         leftOuttakeServo.setPosition(OUTTAKE_DOOR_OPEN_POSITION);
     }
 
+    /**
+     * Opens the right outtake door
+     */
     public void openRightOuttakeDoor() {
         leftOuttakeServo.setPosition(OUTTAKE_DOOR_CLOSED_POSITION);
     }
 
+    /**
+     * Closes both outtake doors
+     */
     public void closeOuttake() {
         rightOuttakeServo.setPosition(OUTTAKE_DOOR_OPEN_POSITION);
     }
 
+    /**
+     * Closes the left outtake door
+     */
     public void closeLeftOuttakeDoor() {
         leftOuttakeServo.setPosition(OUTTAKE_DOOR_CLOSED_POSITION);
     }
 
+    /**
+     * Closes the right outtake door
+     */
     public void closeRightOuttakeDoor() {
         rightOuttakeServo.setPosition(OUTTAKE_DOOR_CLOSED_POSITION);
     }
@@ -257,11 +264,13 @@ public class ArmSubsystem extends SubsystemBase {
         this.wormTargetPosition     = Math.min(wormTargetPosition, MAX_WORM_POSITION);
     }
 
-    /**
-     * Extends the elevator to the provided position at the provided power
-     * @param targetPos The position to move the elevator to
-     * @param power The power to move to the target position at
-     */
+    private boolean isAtPosition() {
+        return wormMotor.getTargetPosition()         == wormTargetPosition
+                && elevatorMotor.getTargetPosition() == elevatorTargetPosition
+                && !elevatorMotor.isBusy()
+                && !wormMotor.isBusy();
+    }
+
     private void extendElevator(int targetPos, double power) {
         elevatorMotor.setTargetPosition(targetPos);
         elevatorMotor.setMode(RUN_TO_POSITION);
@@ -272,21 +281,22 @@ public class ArmSubsystem extends SubsystemBase {
         extendElevator(targetPosition, DEFAULT_ELEVATOR_POWER);
     }
 
-    /**
-     * Rotates the worm to the provided position at the provided power
-     * @param targetPosition The position to move the elevator to
-     * @param power The power to move to the target position at
-     */
     private void rotateWorm(int targetPosition, double power) {
         wormMotor.setTargetPosition(targetPosition);
         wormMotor.setMode(RUN_TO_POSITION);
         wormMotor.setPower(power);
     }
 
+    /**
+     * @return Whether the arm is currently at home (0,0) / Fully inside the frame
+     */
     public boolean isAtHome() {
         return elevatorTargetPosition == 0 && wormTargetPosition == 0 && armState == AT_POSITION;
     }
 
+    /**
+     * @return Whether the worm and elevator is within the frame of the robot
+     */
     public boolean isWithinFrame() {
         return elevatorMotor.getCurrentPosition() <= ELEVATOR_FRAME_LIMIT
                 && wormMotor.getCurrentPosition() <= WORM_FRAME_LIMIT;

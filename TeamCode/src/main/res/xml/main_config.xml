@@ -10,8 +10,8 @@
             <Servo name="rightMosaicFixerServo" port="3"/>
             <Servo name="purplePixelPlacerServo" port="4"/>
             <DigitalDevice name="backBeamBreak" port="1"/>
-            <Led name="rightLEDRedChannel" port="4"/>
-            <Led name="rightLEDGreenChannel" port="5"/>
+            <DigitalDevice name="rightLEDRedChannel" port="4"/>
+            <DigitalDevice name="rightLEDGreenChannel" port="5"/>
             <DigitalDevice name="frontBeamBreak" port="7"/>
         </LynxModule>
         <LynxModule name="Control Hub" port="173">
@@ -25,8 +25,8 @@
             <AnalogInput name="wormPotentiometer " port="0"/>
             <RevTouchSensor name="wormLimitSwitch" port="1"/>
             <RevTouchSensor name="elevatorLimitSwitch" port="3"/>
-            <Led name="leftLEDRedChannel" port="4"/>
-            <Led name="leftLEDGreenChannel" port="5"/>
+            <DigitalDevice name="leftLEDRedChannel" port="4"/>
+            <DigitalDevice name="leftLEDGreenChannel" port="5"/>
             <LynxEmbeddedIMU name="imu" port="0" bus="0"/>
         </LynxModule>
     </LynxUsbDevice>

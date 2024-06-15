@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Subsystems.Arm.Commands;
 
+import androidx.annotation.NonNull;
+
 import com.arcrobotics.ftclib.command.CommandBase;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -9,7 +11,9 @@ public class DisplayArmPositionTelemetry extends CommandBase {
     private final ArmSubsystem armSubsystem;
     private final Telemetry telemetry;
 
-    public DisplayArmPositionTelemetry(ArmSubsystem armSubsystem, Telemetry telemetry) {
+    public DisplayArmPositionTelemetry(
+            @NonNull ArmSubsystem armSubsystem,
+            @NonNull Telemetry telemetry) {
        this.armSubsystem = armSubsystem;
        this.telemetry    = telemetry;
     }

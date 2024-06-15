@@ -14,6 +14,6 @@ public class ArmIsOutsideFrameTrigger extends Trigger {
     }
 
     @Override public boolean get() {
-        return !this.armSubsystem.isWithinFrame();
+        return !armSubsystem.isWithinFrame();
     }
 }

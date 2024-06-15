@@ -73,6 +73,7 @@ public class ConstantsLoader {
         for (Field field : fields) {
             int modifiers = field.getModifiers();
 
+            // Skip any variables we have no business accessing
             if (!Modifier.isStatic(modifiers) || Modifier.isFinal(modifiers)) continue;
 
             populateField(field, properties);
@@ -99,8 +100,7 @@ public class ConstantsLoader {
     /**
      * Loads all of the constants with the constants found in Onbot Java under the Constants
      * directory
-     * @throws IOException Throws an IOException if there is an issue reading any of the constants
-     * files.
+     * @throws IOException if there is an issue reading any of the constants files
      */
     public void loadConstants() throws IOException {
         File[] constantsFiles = getConstantsFilesFromOnbotJava();

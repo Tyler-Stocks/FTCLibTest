@@ -86,15 +86,17 @@ public class Constants {
         public static final String LEFT_OUTTAKE_SERVO_NAME    = "leftOuttakeServo";
         public static final String RIGHT_OUTTAKE_SERVO_NAME   = "rightOuttakeServo";
 
-        public static volatile double DEFAULT_ELEVATOR_POWER       = 1.0;
-        public static volatile double DEFAULT_WORM_POWER           = 1.0;
-        public static volatile double ELEVATOR_HOMING_POWER        = -0.8;
-        public static volatile double WORM_HOMING_POWER            = -0.8;
-        public static volatile double WORM_BACKLASH_REMOVING_POWER = 0.25;
+        public static volatile double DEFAULT_ELEVATOR_POWER        = 1.0;
+        public static volatile double DEFAULT_WORM_POWER            = 1.0;
+        public static volatile double ELEVATOR_HOMING_POWER         = -0.8;
+        public static volatile double WORM_HOMING_POWER             = -0.8;
+        public static volatile double WORM_BACKLASH_REMOVING_POWER  = 0.25;
+        public static volatile double ELEVATOR_INTAKE_HOLDING_POWER = 0.001;
 
         public static volatile double WORM_SAFETY_VOLTAGE = 0.8;
 
         public static volatile int WORM_SAFETY_LIMIT     = 700;
+        public static volatile int WORM_SAFETY_THRESHOLD = WORM_SAFETY_LIMIT + 20;
         public static volatile int MAX_ELEVATOR_POSITION = 2750;
         public static volatile int MAX_WORM_POSITION     = 2500;
 

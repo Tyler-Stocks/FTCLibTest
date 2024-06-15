@@ -13,18 +13,22 @@ public class SetArmTargetPositionCommand extends CommandBase {
 
     private boolean isFinished = false;
 
-    public SetArmTargetPositionCommand(@NonNull ArmSubsystem armSubsystem, int wormPosition, int elevatorPosition) {
+    public SetArmTargetPositionCommand(
+            @NonNull ArmSubsystem armSubsystem,
+            int wormPosition,
+            int elevatorPosition)
+    {
        this.armSubsystem     = armSubsystem;
        this.wormPosition     = wormPosition;
        this.elevatorPosition = elevatorPosition;
     }
 
     @Override public void execute() {
-        this.armSubsystem.setTargetPos(this.elevatorPosition, this.wormPosition);
+        armSubsystem.setTargetPos(elevatorPosition, wormPosition);
         isFinished = true;
     }
 
     @Override public boolean isFinished() {
-        return this.isFinished;
+        return isFinished;
     }
 }
