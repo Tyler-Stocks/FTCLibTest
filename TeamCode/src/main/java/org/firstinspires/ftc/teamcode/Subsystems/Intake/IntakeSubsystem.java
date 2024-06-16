@@ -115,7 +115,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     /**
-     * Displays debug information about the intake
+     * Displays debugArm information about the intake
      * @param telemetry The telemetry to display the information on
      */
     public void debug(@NonNull Telemetry telemetry) {

@@ -43,30 +43,37 @@ public class MosaicFixerSubsystem extends SubsystemBase {
     }
 
     public void moveLeftMosaicFixerToLowPosition() {
+        enableLeftMosaicFixer();
         leftMosaicFixerServo.setPosition(MOSAIC_FIXER_LEFT_LOW_POSITION);
     }
 
     public void moveLeftMosaicFixerToMediumPosition() {
+        enableLeftMosaicFixer();
         leftMosaicFixerServo.setPosition(MOSAIC_FIXER_LEFT_MEDIUM_POSITION);
     }
 
     public void moveLeftMosaicFixerToHighPosition() {
+        enableLeftMosaicFixer();
         leftMosaicFixerServo.setPosition(MOSAIC_FIXER_LEFT_HIGH_POSITION);
     }
 
     public void moveRightMosaicFixerToLowPosition() {
+        enableRightMosaicFixer();
         rightMosaicFixerServo.setPosition(MOSAIC_FIXER_RIGHT_LOW_POSITION);
     }
 
     public void moveRightMosaicFixerToHighPosition() {
+        enableRightMosaicFixer();
         rightMosaicFixerServo.setPosition(MOSAIC_FIXER_RIGHT_HIGH_POSITION);
     }
 
     public void retractMosaicFixerLeft() {
+        enableLeftMosaicFixer();
         leftMosaicFixerServo.setPosition(MOSAIC_FIXER_LEFT_HOME_POSITION);
     }
 
     public void retractMosaicFixerRight() {
+        enableRightMosaicFixer();
         rightMosaicFixerServo.setPosition(MOSAIC_FIXER_RIGHT_HOME_POSITION);
     }
 }

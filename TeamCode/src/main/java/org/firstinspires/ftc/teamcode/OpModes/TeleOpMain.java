@@ -2,9 +2,11 @@ package org.firstinspires.ftc.teamcode.OpModes;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.InstantCommand;
+import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.command.button.Trigger;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import static org.firstinspires.ftc.teamcode.PlayStationController.PlayStationController.*;
@@ -16,6 +18,8 @@ import org.firstinspires.ftc.teamcode.Subsystems.Arm.Triggers.ArmIsOutsideFrameT
 import org.firstinspires.ftc.teamcode.Subsystems.Drive.Commands.DriveRobotCentricCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.Drive.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.Hanger.HangerSubsystem;
+import org.firstinspires.ftc.teamcode.Subsystems.Intake.Commands.IntakeCommand;
+import org.firstinspires.ftc.teamcode.Subsystems.Intake.Commands.OuttakeCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake.Triggers.BackBeamBreakTrigger;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake.Triggers.FrontBeamBreakTrigger;
@@ -23,8 +27,6 @@ import org.firstinspires.ftc.teamcode.Subsystems.LEDController.LEDSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher.LauncherSubsystem;
 import org.firstinspires.ftc.teamcode.PlayStationController.Triggers.LeftGamepadTrigger;
 import org.firstinspires.ftc.teamcode.PlayStationController.Triggers.RightGamepadTrigger;
-import org.firstinspires.ftc.teamcode.Subsystems.MosaicFixers.Commands.RetractLeftMosaicFixerCommand;
-import org.firstinspires.ftc.teamcode.Subsystems.MosaicFixers.Commands.RetractRightMosaicFixerCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.MosaicFixers.MosaicFixerSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.PurplePixelPlacer.PurplePixelPlacerSubsystem;
 
@@ -61,6 +63,8 @@ public class TeleOpMain extends CommandOpMode {
 
         loadConstants();
 
+        setLynxModuleBulkCaching();
+
         initializeSubsystems();
         initializeGamepads();
 
@@ -76,11 +80,18 @@ public class TeleOpMain extends CommandOpMode {
                  driveSubsystem,
                  mosaicFixerSubsystem,
                  purplePixelPlacerSubsystem);
+
+        schedule(
+                new RunCommand(telemetry::update),
+                new DriveRobotCentricCommand(
+                        driveSubsystem,
+                        driverGamepad::getLeftY,
+                        driverGamepad::getLeftX,
+                        driverGamepad::getRightX
+                )
+        );
     }
 
-    /**
-     * Tries to load the constants files from onbot java
-     */
     private void loadConstants() {
         ConstantsLoader constantsLoader = new ConstantsLoader();
 
@@ -92,10 +103,6 @@ public class TeleOpMain extends CommandOpMode {
         }
     }
 
-    /**
-     * Creates all of the subsystems. Using any of them before this function is called will
-     * produce a null pointer exception
-     */
     private void initializeSubsystems() {
         launcherSubsystem          = new LauncherSubsystem(hardwareMap);
         hangerSubsystem            = new HangerSubsystem(hardwareMap);
@@ -107,34 +114,15 @@ public class TeleOpMain extends CommandOpMode {
         purplePixelPlacerSubsystem = new PurplePixelPlacerSubsystem(hardwareMap);
     }
 
-    /**
-     * Creates the driver and operator gamepads. Using them before this function is called will
-     * produce a null pointer exception
-     */
     private void initializeGamepads() {
         driverGamepad   = new GamepadEx(gamepad1);
         operatorGamepad = new GamepadEx(gamepad2);
     }
 
-    /**
-     * Sets the default command of each subsystem when it is applicable
-     */
     private void setDefaultCommands() {
-        driveSubsystem.setDefaultCommand(
-                new DriveRobotCentricCommand(
-                        driveSubsystem,
-                        driverGamepad::getLeftY,
-                        driverGamepad::getLeftX,
-                        driverGamepad::getRightX
-                )
-        );
-
         intakeSubsystem.setDefaultCommand(new InstantCommand(intakeSubsystem::stop));
     }
 
-    /**
-     * Configures all of the button bindings
-     */
     private void configureBindings() {
         // ---------- Arm Triggers (Controlled by operator) ---------- //
 
@@ -186,10 +174,10 @@ public class TeleOpMain extends CommandOpMode {
 
         new LeftGamepadTrigger(INTAKE_TRIGGER_THRESHOLD, operatorGamepad)
                 .and(new Trigger(armSubsystem::isAtHome)) // Prevent intaking when we are not homed
-                .whenActive(intakeSubsystem::intake);
+                .whenActive(new IntakeCommand(intakeSubsystem, armSubsystem));
 
         new RightGamepadTrigger(OUTTAKE_TRIGGER_THRESHOLD, operatorGamepad)
-                .whenActive(intakeSubsystem::outtake);
+                .whenActive(new OuttakeCommand(intakeSubsystem, armSubsystem));
 
         // ---------- Mosaic Fixer Triggers (Controlled By Driver) ---------- //
 
@@ -200,7 +188,7 @@ public class TeleOpMain extends CommandOpMode {
                 .whenPressed(mosaicFixerSubsystem::disableRightMosaicFixer);
 
         new GamepadButton(driverGamepad, CROSS)
-                .whenPressed(new RetractRightMosaicFixerCommand(mosaicFixerSubsystem));
+                .whenPressed(mosaicFixerSubsystem::retractMosaicFixerRight);
 
         new GamepadButton(driverGamepad, SQUARE)
                 .whenPressed(mosaicFixerSubsystem::moveRightMosaicFixerToLowPosition);
@@ -209,7 +197,7 @@ public class TeleOpMain extends CommandOpMode {
                 .whenPressed(mosaicFixerSubsystem::moveRightMosaicFixerToHighPosition);
 
         new GamepadButton(driverGamepad, DPAD_DOWN)
-                .whenPressed(new RetractLeftMosaicFixerCommand(mosaicFixerSubsystem));
+                .whenPressed(mosaicFixerSubsystem::retractMosaicFixerLeft);
 
         new GamepadButton(driverGamepad, DPAD_LEFT)
                 .whenPressed(mosaicFixerSubsystem::moveLeftMosaicFixerToLowPosition);
@@ -231,9 +219,6 @@ public class TeleOpMain extends CommandOpMode {
                 .whenPressed(this::toggleGameState);
     }
 
-    /**
-     * Configures the automatic triggers, such as LED's
-     */
     private void configureTriggers() {
         // ---------- LED Triggers ---------- //
 
@@ -244,9 +229,6 @@ public class TeleOpMain extends CommandOpMode {
                 .toggleWhenActive(ledSubsystem::setRightLEDRed, ledSubsystem::setRightLEDGreen);
     }
 
-    /**
-     * Toggles the game state between TELEOP and ENDGAME
-     */
     private void toggleGameState() {
        switch (gameState) {
            case TELEOP:
@@ -258,17 +240,17 @@ public class TeleOpMain extends CommandOpMode {
        }
     }
 
-    /**
-     * @return Whether the teleop is currently in endgame
-     */
     private boolean isInEndgame() {
         return gameState == ENDGAME;
     }
 
-    /**
-     * @return Whether the teleop is currently in teleop
-     */
     private boolean isInTeleOp() {
         return gameState == TELEOP;
+    }
+
+    private void setLynxModuleBulkCaching() {
+        for (LynxModule lynxModule : hardwareMap.getAll(LynxModule.class)) {
+            lynxModule.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
+        }
     }
 }

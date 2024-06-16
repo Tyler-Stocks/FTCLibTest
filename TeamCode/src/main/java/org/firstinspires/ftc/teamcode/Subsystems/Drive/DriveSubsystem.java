@@ -4,15 +4,19 @@ import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.*;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.*;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.DcMotorImplEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.Subsystems.Utility.MotorUtility;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.RADIANS;
+import static org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit.AMPS;
 import static org.firstinspires.ftc.teamcode.Constants.Constants.DrivebaseConstants.*;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -23,7 +27,12 @@ public class DriveSubsystem extends SubsystemBase {
 
     private final IMU imu;
 
+    @Nullable
+    private Telemetry telemetry;
+
     public DriveSubsystem(@NonNull HardwareMap hardwareMap) {
+        telemetry = null;
+
         frontLeftMotor  = hardwareMap.get(DcMotorImplEx.class, FRONT_LEFT_DRIVE_MOTOR_NAME);
         frontRightMotor = hardwareMap.get(DcMotorImplEx.class, FRONT_RIGHT_DRIVE_MOTOR_NAME);
         backLeftMotor   = hardwareMap.get(DcMotorImplEx.class, BACK_LEFT_DRIVE_MOTOR_NAME);
@@ -122,5 +131,34 @@ public class DriveSubsystem extends SubsystemBase {
         frontRightMotor.setPower(frontRightPower);
         backLeftMotor.setPower(backLeftPower);
         backRightMotor.setPower(backRightPower);
+    }
+
+    /**
+     * Sets the telemetry for the subsystem
+     * @param telemetry The telemetry to set the subsystem
+     */
+    public void setTelemetry(@NonNull Telemetry telemetry) {
+        this.telemetry = telemetry;
+    }
+
+    /**
+     * Displays debug information about the drive base
+     */
+    public void debugDrive() {
+       if (telemetry == null) return;
+
+       telemetry.addLine("----- Drive Debug -----");
+       telemetry.addData("Front Left Direction", frontLeftMotor.getDirection());
+       telemetry.addData("Front Right Direction", frontRightMotor.getDirection());
+       telemetry.addData("Back Left Direction", backLeftMotor.getDirection());
+       telemetry.addData("Back Right Direction", backRightMotor.getDirection());
+       telemetry.addData("Front Left Current", frontLeftMotor.getCurrent(AMPS));
+       telemetry.addData("Front Right Current", frontRightMotor.getCurrent(AMPS));
+       telemetry.addData("Back Left Current", backLeftMotor.getCurrent(AMPS));
+       telemetry.addData("Back Right Current", backRightMotor.getCurrent(AMPS));
+       telemetry.addData("Front Left Power", frontLeftMotor.getPower());
+       telemetry.addData("Front Right Power", frontRightMotor.getPower());
+       telemetry.addData("Back Left Power", backLeftMotor.getPower());
+       telemetry.addData("Back Right Power", backRightMotor.getPower());
     }
 }

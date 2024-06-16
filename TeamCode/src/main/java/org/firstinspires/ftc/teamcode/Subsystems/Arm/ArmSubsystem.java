@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Subsystems.Arm;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.hardware.rev.RevTouchSensor;
@@ -12,15 +13,33 @@ import static com.qualcomm.robotcore.hardware.DcMotor.RunMode.*;
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.*;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.*;
 
+import static org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit.AMPS;
 import static org.firstinspires.ftc.teamcode.Constants.Constants.ArmConstants.*;
 import static org.firstinspires.ftc.teamcode.Subsystems.Arm.ArmHomingState.*;
 import static org.firstinspires.ftc.teamcode.Subsystems.Arm.ArmState.*;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Subsystems.Utility.MotorUtility;
 
+/**
+ * <h1>ArmSubsystem</h1>
+ * <br>
+ * <p>
+ *     Subsystem to encapsulate the entire arm mechanism. This includes the following components:
+ *     <ul>
+ *         <li>The worm and extension motors</li>
+ *         <li>The worm and extension limit switches</li>
+ *         <li>The worm potentiometer</li>
+ *         <li>The outtake servos</li>
+ *     </ul>
+ * </p>
+ */
 public class ArmSubsystem extends SubsystemBase {
     private ArmHomingState armHomingState;
     private ArmState armState;
+
+    @Nullable
+    private Telemetry telemetry;
 
     private final DcMotorImplEx wormMotor,
                                 elevatorMotor;
@@ -37,7 +56,12 @@ public class ArmSubsystem extends SubsystemBase {
 
     private double elevatorPower, wormPower;
 
+    /**
+     * Constructs, and initializes a new arm subsystem.
+     * @param hardwareMap The hardware map to get the hardware from, FTC
+     */
     public ArmSubsystem(@NonNull HardwareMap hardwareMap) {
+        telemetry = null;
 
         // Control Hub Digital Port 0
         wormLimitSwitch  = hardwareMap.get(RevTouchSensor.class, WORM_LIMIT_SWITCH_NAME);
@@ -87,22 +111,23 @@ public class ArmSubsystem extends SubsystemBase {
 
                 if (elevatorTargetPosition == 0 && wormTargetPosition == 0) {
                     elevatorMotor.setPower(0.0);
-                } else {
-                    elevatorMotor.setPower(ELEVATOR_INTAKE_HOLDING_POWER);
                 }
                 break;
             case TO_POSITION:
                 if (elevatorTargetPosition == 0 && wormTargetPosition == 0) {
 
-                    if (wormMotor.getCurrentPosition() > WORM_SAFETY_LIMIT && elevatorMotor.getCurrentPosition() > 10) {
+                    if (wormMotor.getCurrentPosition() > WORM_SAFETY_LIMIT
+                            && elevatorMotor.getCurrentPosition() > 10) {
                         extendElevator(0, elevatorPower);
                     }
 
-                    else if (wormMotor.getCurrentPosition() < WORM_SAFETY_LIMIT && elevatorMotor.getCurrentPosition() > 900) {
+                    else if (wormMotor.getCurrentPosition() < WORM_SAFETY_LIMIT
+                            && elevatorMotor.getCurrentPosition() > 900) {
                         rotateWorm(WORM_SAFETY_THRESHOLD, wormPower);
                         extendElevator(1000);
 
-                    } else if (90 < elevatorMotor.getCurrentPosition() && elevatorMotor.getCurrentPosition() < 900) {
+                    } else if (90 < elevatorMotor.getCurrentPosition()
+                            && elevatorMotor.getCurrentPosition() < 900) {
                         extendElevator(0, elevatorPower);
                     } else {
                         rotateWorm(wormTargetPosition, wormPower);
@@ -133,19 +158,17 @@ public class ArmSubsystem extends SubsystemBase {
     private void home() {
         switch (armHomingState) {
             case START:
-                closeOuttake(); // Make sure the outtake is closed so we don't break it
+                closeOuttake();
 
                 MotorUtility.setRunModes(RUN_USING_ENCODER, wormMotor, elevatorMotor);
 
-                // If the worm power is greater than the safety voltage, start homing the elevator
                 if (wormPotentiometer.getVoltage() >= WORM_SAFETY_VOLTAGE) {
                     wormMotor.setPower(0.0);
                     armHomingState = HOMING_ELEVATOR;
-                } else { // If the voltage is less than the safety limit, drive the worm up,
+                } else {
                     wormMotor.setPower(1.0);
                     elevatorMotor.setPower(-0.05);
 
-                    // If the limit switch is pressed, we start homing the elevator
                     if (elevatorLimitSwitch.isPressed()) {
                         wormMotor.setPower(0.0);
                         armHomingState = HOMING_ELEVATOR;
@@ -344,5 +367,42 @@ public class ArmSubsystem extends SubsystemBase {
      */
     public int localElevatorTargetPosition() {
         return elevatorTargetPosition;
+    }
+
+    /**
+     * Sets the telemetry of the arm subsystem
+     * @param telemetry The telemetry of the arm subsystem
+     */
+    public void setTelemetry(@NonNull Telemetry telemetry) {
+        this.telemetry = telemetry;
+    }
+
+    public void debugArm() {
+       if (telemetry == null) return;
+
+       telemetry.addLine("----- Arm Debug -----");
+       telemetry.addData("Worm Current (AMPS)", wormMotor.getCurrent(AMPS));
+       telemetry.addData("Elevator Current (AMPS)", elevatorMotor.getCurrent(AMPS));
+       telemetry.addData("Worm Limit Switch Pressed", wormLimitSwitch.isPressed());
+       telemetry.addData("Elevator Limit Switch Pressed", elevatorLimitSwitch.isPressed());
+       telemetry.addData("Worm Position", wormMotor.getCurrentPosition());
+       telemetry.addData("Elevator Position", elevatorMotor.getCurrentPosition());
+       telemetry.addData("Worm Target Position", wormMotor.getTargetPosition());
+       telemetry.addData("Elevator Target Position", elevatorMotor.getTargetPosition());
+       telemetry.addData("Worm Target Position (Local)", wormTargetPosition);
+       telemetry.addData("Elevator Target Position (Local)", elevatorTargetPosition);
+       telemetry.addData("Worm Direction", wormMotor.getDirection());
+       telemetry.addData("Elevator Direction", elevatorMotor.getDirection());
+       telemetry.addData("Potentiometer Voltage", wormPotentiometer.getVoltage());
+    }
+
+    public void debugOuttake() {
+        if (telemetry == null) return;
+
+        telemetry.addLine("----- Outtake Debug -----");
+        telemetry.addData("Left Outtake Position", leftOuttakeServo.getPosition());
+        telemetry.addData("Right Outtake Position", rightOuttakeServo.getPosition());
+        telemetry.addData("Left Outtake Direction (SDK)", leftOuttakeServo.getDirection());
+        telemetry.addData("Right Outtake Direction (SDK)", rightOuttakeServo.getDirection());
     }
 }
