@@ -15,7 +15,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Arm.Commands.DisplayArmPosition
 public class ArmMeasurement extends CommandOpMode {
 
     @Override public void initialize() {
-        ArmSubsystem armSubsystem = new ArmSubsystem(hardwareMap);
+        ArmSubsystem armSubsystem = new ArmSubsystem(this);
 
         armSubsystem.setDefaultCommand(new DisplayArmPositionTelemetry(armSubsystem, telemetry));
 

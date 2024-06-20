@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.hardware.rev.RevTouchSensor;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.DcMotorImplEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -38,9 +39,6 @@ public class ArmSubsystem extends SubsystemBase {
     private ArmHomingState armHomingState;
     private ArmState armState;
 
-    @Nullable
-    private Telemetry telemetry;
-
     private final DcMotorImplEx wormMotor,
                                 elevatorMotor;
 
@@ -52,33 +50,31 @@ public class ArmSubsystem extends SubsystemBase {
 
     private final AnalogInput wormPotentiometer;
 
+    private final Telemetry telemetry;
+
     private int wormTargetPosition, elevatorTargetPosition;
 
     private double elevatorPower, wormPower;
 
     /**
      * Constructs, and initializes a new arm subsystem.
-     * @param hardwareMap The hardware map to get the hardware from, FTC
+     * @param opMode The opmode you are running ; To obtain the hardwareMap and telemetry objects
      */
-    public ArmSubsystem(@NonNull HardwareMap hardwareMap) {
-        telemetry = null;
+    public ArmSubsystem(@NonNull OpMode opMode) {
+        telemetry = opMode.telemetry;
 
-        // Control Hub Digital Port 0
-        wormLimitSwitch  = hardwareMap.get(RevTouchSensor.class, WORM_LIMIT_SWITCH_NAME);
-        // Expansion Hub Digital Port 0
-        elevatorLimitSwitch = hardwareMap.get(RevTouchSensor.class, ELEVATOR_LIMIT_SWITCH_NAME);
+        wormLimitSwitch
+                = opMode.hardwareMap.get(RevTouchSensor.class, WORM_LIMIT_SWITCH_NAME);
+        elevatorLimitSwitch
+                = opMode.hardwareMap.get(RevTouchSensor.class, ELEVATOR_LIMIT_SWITCH_NAME);
 
-        // Expansion Hub Motor Port 0
-        wormMotor  = hardwareMap.get(DcMotorImplEx.class, WORM_MOTOR_NAME);
-        // Control Hub Motor Port 3
-        elevatorMotor = hardwareMap.get(DcMotorImplEx.class, ELEVATOR_MOTOR_NAME);
+        wormMotor     = opMode.hardwareMap.get(DcMotorImplEx.class, WORM_MOTOR_NAME);
+        elevatorMotor = opMode.hardwareMap.get(DcMotorImplEx.class, ELEVATOR_MOTOR_NAME);
 
-        // Expansion Hub Port 1
-        leftOuttakeServo = hardwareMap.get(ServoImplEx.class, LEFT_OUTTAKE_SERVO_NAME);
-        // Expansion Hub Port 2
-        rightOuttakeServo = hardwareMap.get(ServoImplEx.class, RIGHT_OUTTAKE_SERVO_NAME);
+        leftOuttakeServo  = opMode.hardwareMap.get(ServoImplEx.class, LEFT_OUTTAKE_SERVO_NAME);
+        rightOuttakeServo = opMode.hardwareMap.get(ServoImplEx.class, RIGHT_OUTTAKE_SERVO_NAME);
 
-        wormPotentiometer = hardwareMap.analogInput.get(WORM_POTENTIOMETER_NAME);
+        wormPotentiometer = opMode.hardwareMap.analogInput.get(WORM_POTENTIOMETER_NAME);
 
         elevatorMotor.setDirection(REVERSE);
         elevatorMotor.setZeroPowerBehavior(BRAKE);
@@ -370,15 +366,9 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     /**
-     * Sets the telemetry of the arm subsystem
-     * @param telemetry The telemetry of the arm subsystem
+     * Displays debug information about the arm
      */
-    public void setTelemetry(@NonNull Telemetry telemetry) {
-        this.telemetry = telemetry;
-    }
-
     public void debugArm() {
-       if (telemetry == null) return;
 
        telemetry.addLine("----- Arm Debug -----");
        telemetry.addData("Worm Current (AMPS)", wormMotor.getCurrent(AMPS));
@@ -396,8 +386,10 @@ public class ArmSubsystem extends SubsystemBase {
        telemetry.addData("Potentiometer Voltage", wormPotentiometer.getVoltage());
     }
 
+    /**
+     * Displays debug information about the outtake
+     */
     public void debugOuttake() {
-        if (telemetry == null) return;
 
         telemetry.addLine("----- Outtake Debug -----");
         telemetry.addData("Left Outtake Position", leftOuttakeServo.getPosition());

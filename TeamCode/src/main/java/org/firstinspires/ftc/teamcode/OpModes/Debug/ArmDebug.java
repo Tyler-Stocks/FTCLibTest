@@ -22,10 +22,8 @@ public class ArmDebug extends CommandOpMode {
     @Override public void initialize() {
        loadConstants();
 
-       armSubsystem = new ArmSubsystem(hardwareMap);
+       armSubsystem = new ArmSubsystem(this);
        operatorGamepad = new GamepadEx(gamepad2);
-
-       armSubsystem.setTelemetry(telemetry);
 
        configureBindings();
 

@@ -26,17 +26,21 @@ import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 
+import org.firstinspires.ftc.teamcode.Constants.ConstantsLoader;
 import org.firstinspires.ftc.teamcode.Subsystems.Arm.ArmSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.Arm.Commands.SetArmTargetPositionCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.Arm.Triggers.ArmIsOutsideFrameTrigger;
+
+import java.io.IOException;
 
 public class OuttakeDebug extends CommandOpMode {
     private ArmSubsystem armSubsystem;
     private GamepadEx operatorGamepad;
 
     @Override public void initialize() {
-       armSubsystem = new ArmSubsystem(hardwareMap);
-       armSubsystem.setTelemetry(telemetry);
+       loadConstants();
+
+       armSubsystem = new ArmSubsystem(this);
 
        operatorGamepad = new GamepadEx(gamepad2);
 
@@ -94,4 +98,11 @@ public class OuttakeDebug extends CommandOpMode {
                 .toggleWhenActive(armSubsystem::openRightOuttakeDoor, armSubsystem::closeRightOuttakeDoor);
     }
 
+    private void loadConstants() {
+        try {
+            new ConstantsLoader().loadConstants();
+        } catch (IOException ioException) {
+            telemetry.addData("Failed to read constants file", ioException.getMessage());
+        }
+    }
 }

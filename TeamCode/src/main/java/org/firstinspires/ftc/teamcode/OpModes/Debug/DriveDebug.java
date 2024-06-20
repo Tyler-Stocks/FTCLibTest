@@ -4,35 +4,43 @@ import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 
+import org.firstinspires.ftc.teamcode.Constants.ConstantsLoader;
 import org.firstinspires.ftc.teamcode.Subsystems.Drive.Commands.DriveRobotCentricCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.Drive.DriveSubsystem;
+
+import java.io.IOException;
 
 public class DriveDebug extends CommandOpMode {
     private DriveSubsystem driveSubsystem;
     private GamepadEx driverGamepad;
 
     @Override public void initialize() {
-       driveSubsystem = new DriveSubsystem(hardwareMap);
+        loadConstants();
 
-       driveSubsystem.setTelemetry(telemetry);
+        driveSubsystem = new DriveSubsystem(this);
 
-       driverGamepad = new GamepadEx(gamepad1);
+        driverGamepad = new GamepadEx(gamepad1);
 
-       schedule(
-               new DriveRobotCentricCommand(
-                       driveSubsystem,
-                       this::getLeftY, // We need a wrapper function to negate it
-                       driverGamepad::getLeftX,
-                       driverGamepad::getRightX
-               ),
-               new RunCommand(driveSubsystem::debugDrive),
-               new RunCommand(telemetry::update)
-       );
+        schedule(
+                new DriveRobotCentricCommand(
+                        driveSubsystem,
+                        driverGamepad::getLeftY,
+                        driverGamepad::getLeftX,
+                        driverGamepad::getRightX
+                ),
+                new RunCommand(driveSubsystem::debugDrive),
+                new RunCommand(telemetry::update)
+        );
 
        register(driveSubsystem);
     }
 
-    private double getLeftY() {
-        return driverGamepad.getLeftY() * -1.0;
+    private void loadConstants() {
+         try {
+             new ConstantsLoader().loadConstants();
+         } catch (IOException ioException) {
+             telemetry.addLine("Failed to load constants " + ioException.getMessage());
+             telemetry.update();
+         }
     }
 }
