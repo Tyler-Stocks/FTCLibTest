@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorImplEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -19,6 +20,20 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.RADI
 import static org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit.AMPS;
 import static org.firstinspires.ftc.teamcode.Constants.Constants.DrivebaseConstants.*;
 
+/**
+ * <h1>Drive Subsystem</h1>
+ * <br>
+ * <p>
+ *     Subsystem to encapsulate the drive motors. Contains the following hardware
+ *     <ul>
+ *         <li>Front Left Drive Motor</li>
+ *         <li>Front Right Drive Motor</li>
+ *         <li>Back Left Drive Motor</li>
+ *         <li>Back Right Drive Motor</li>
+ *         <li>Imu</li>
+ *     </ul>
+ * </p>
+ */
 public class DriveSubsystem extends SubsystemBase {
     private final DcMotorImplEx frontLeftMotor,
                                 frontRightMotor,
@@ -27,18 +42,21 @@ public class DriveSubsystem extends SubsystemBase {
 
     private final IMU imu;
 
-    @Nullable
-    private Telemetry telemetry;
+    private final Telemetry telemetry;
 
-    public DriveSubsystem(@NonNull HardwareMap hardwareMap) {
-        telemetry = null;
+    /**
+     * Constructs a new drive subsystems
+     * @param opMode The opMode you are running ; To obtain the hardwareMap and telemetry objects
+     */
+    public DriveSubsystem(@NonNull OpMode opMode) {
+        telemetry = opMode.telemetry;
 
-        frontLeftMotor  = hardwareMap.get(DcMotorImplEx.class, FRONT_LEFT_DRIVE_MOTOR_NAME);
-        frontRightMotor = hardwareMap.get(DcMotorImplEx.class, FRONT_RIGHT_DRIVE_MOTOR_NAME);
-        backLeftMotor   = hardwareMap.get(DcMotorImplEx.class, BACK_LEFT_DRIVE_MOTOR_NAME);
-        backRightMotor  = hardwareMap.get(DcMotorImplEx.class, BACK_RIGHT_DRIVE_MOTOR_NAME);
+        frontLeftMotor  = opMode.hardwareMap.get(DcMotorImplEx.class, FRONT_LEFT_DRIVE_MOTOR_NAME);
+        frontRightMotor = opMode.hardwareMap.get(DcMotorImplEx.class, FRONT_RIGHT_DRIVE_MOTOR_NAME);
+        backLeftMotor   = opMode.hardwareMap.get(DcMotorImplEx.class, BACK_LEFT_DRIVE_MOTOR_NAME);
+        backRightMotor  = opMode.hardwareMap.get(DcMotorImplEx.class, BACK_RIGHT_DRIVE_MOTOR_NAME);
 
-        imu = hardwareMap.get(IMU.class, IMU_NAME);
+        imu = opMode.hardwareMap.get(IMU.class, IMU_NAME);
 
         imu.initialize(IMU_PARAMETERS);
 
@@ -69,6 +87,12 @@ public class DriveSubsystem extends SubsystemBase {
 
     // ---------- Drive Functions ---------- //
 
+    /**
+     * Drives the robot relative to itself
+     * @param drive The drive value
+     * @param strafe The strafe value
+     * @param turn The turn value
+     */
     public void driveRobotCentric(double drive, double strafe, double turn) {
         if (drive < DRIVE_DEAD_ZONE)   drive  = 0.0;
         if (strafe < STRAFE_DEAD_ZONE) strafe = 0.0;
@@ -100,7 +124,13 @@ public class DriveSubsystem extends SubsystemBase {
         backRightMotor.setPower(backRightPower);
     }
 
-    public void driveFieldCentric(double drive, double strafe, double turn) {
+    /**
+     * Drives the robot relative to the field
+     * @param drive The value to move forward
+     * @param strafe The value to strafe
+     * @param turn The value to turn
+     */
+    private void driveFieldCentric(double drive, double strafe, double turn) {
         if (drive < DRIVE_DEAD_ZONE)   drive  = 0.0;
         if (strafe < STRAFE_DEAD_ZONE) strafe = 0.0;
         if (turn < TURN_DEAD_ZONE)     turn   = 0.0;
@@ -134,18 +164,9 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     /**
-     * Sets the telemetry for the subsystem
-     * @param telemetry The telemetry to set the subsystem
-     */
-    public void setTelemetry(@NonNull Telemetry telemetry) {
-        this.telemetry = telemetry;
-    }
-
-    /**
      * Displays debug information about the drive base
      */
     public void debugDrive() {
-       if (telemetry == null) return;
 
        telemetry.addLine("----- Drive Debug -----");
        telemetry.addData("Front Left Direction", frontLeftMotor.getDirection());

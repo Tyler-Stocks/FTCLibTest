@@ -93,10 +93,8 @@ public class TeleOpMain extends CommandOpMode {
     }
 
     private void loadConstants() {
-        ConstantsLoader constantsLoader = new ConstantsLoader();
-
         try {
-            constantsLoader.loadConstants();
+            new ConstantsLoader().loadConstants();
         } catch (IOException ioException) {
             telemetry.addData("Failed to load constants file", ioException.getCause());
             telemetry.update();
@@ -104,14 +102,14 @@ public class TeleOpMain extends CommandOpMode {
     }
 
     private void initializeSubsystems() {
-        launcherSubsystem          = new LauncherSubsystem(hardwareMap);
-        hangerSubsystem            = new HangerSubsystem(hardwareMap);
-        intakeSubsystem            = new IntakeSubsystem(hardwareMap);
-        armSubsystem               = new ArmSubsystem(hardwareMap);
-        driveSubsystem             = new DriveSubsystem(hardwareMap);
-        mosaicFixerSubsystem       = new MosaicFixerSubsystem(hardwareMap);
-        ledSubsystem               = new LEDSubsystem(hardwareMap);
-        purplePixelPlacerSubsystem = new PurplePixelPlacerSubsystem(hardwareMap);
+        launcherSubsystem          = new LauncherSubsystem(this);
+        hangerSubsystem            = new HangerSubsystem(this);
+        intakeSubsystem            = new IntakeSubsystem(this);
+        armSubsystem               = new ArmSubsystem(this);
+        driveSubsystem             = new DriveSubsystem(this);
+        mosaicFixerSubsystem       = new MosaicFixerSubsystem(this);
+        ledSubsystem               = new LEDSubsystem(this);
+        purplePixelPlacerSubsystem = new PurplePixelPlacerSubsystem(this);
     }
 
     private void initializeGamepads() {

@@ -5,6 +5,7 @@ import static com.qualcomm.robotcore.hardware.DigitalChannel.Mode.OUTPUT;
 import androidx.annotation.NonNull;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DigitalChannelImpl;
 import com.qualcomm.robotcore.hardware.HardwareMap;
@@ -12,21 +13,48 @@ import com.qualcomm.robotcore.hardware.LED;
 
 import static org.firstinspires.ftc.teamcode.Subsystems.LEDController.LEDState.*;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
+/**
+ * <h1>LED Subsystem</h1>
+ * <br>
+ * <p>
+ *     Subsystem to encapsulate the four digital channels that control the LED's on the robot.
+ *     Contains the following hardware
+ *     <ul>
+ *         <li>Red Channel Left</li>
+ *         <li>Green Channel Left</li>
+ *         <li>Red Channel Right</li>
+ *         <li>Green Channel Right</li>
+ *     </ul>
+ * </p>
+ */
 public class LEDSubsystem extends SubsystemBase {
     private final DigitalChannelImpl leftLEDRedChannel,
                                      leftLEDGreenChannel,
                                      rightLEDRedChannel,
                                      rightLEDGreenChannel;
 
+    private final Telemetry telemetry;
+
     private LEDState leftLEDState,
                      rightLEDState;
 
+    /**
+     * Constructs a new LEDSubsystem
+     * @param opMode The opMode you are running ; To obtain the hardwareMap and telemetry
+     */
+    public LEDSubsystem(@NonNull OpMode opMode) {
+        telemetry = opMode.telemetry;
 
-    public LEDSubsystem(@NonNull HardwareMap hardwareMap) {
-        leftLEDRedChannel    = hardwareMap.get(DigitalChannelImpl.class, "leftLEDRedChannel");
-        leftLEDGreenChannel  = hardwareMap.get(DigitalChannelImpl.class, "leftLEDGreenChannel");
-        rightLEDRedChannel   = hardwareMap.get(DigitalChannelImpl.class, "rightLEDRedChannel");
-        rightLEDGreenChannel = hardwareMap.get(DigitalChannelImpl.class, "rightLEDGreenChannel");
+        leftLEDRedChannel
+                = opMode.hardwareMap.get(DigitalChannelImpl.class, "leftLEDRedChannel");
+        leftLEDGreenChannel
+                = opMode.hardwareMap.get(DigitalChannelImpl.class, "leftLEDGreenChannel");
+        rightLEDRedChannel
+                = opMode.hardwareMap.get(DigitalChannelImpl.class, "rightLEDRedChannel");
+        rightLEDGreenChannel
+                = opMode.hardwareMap.get(DigitalChannelImpl.class, "rightLEDGreenChannel");
 
         leftLEDRedChannel.setMode(OUTPUT);
         leftLEDGreenChannel.setMode(OUTPUT);

@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.*;
+
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorImplEx;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.*;
 
@@ -16,21 +18,42 @@ import static org.firstinspires.ftc.teamcode.Constants.Constants.IntakeConstants
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+/**
+ * <h1>Intake Subsystem</h1>
+ * <br>
+ * <p>
+ *     Subsystem to encapsulate intake. Encapsulates the following
+ *     hardware:
+ *     <ul>
+ *         <li>Intake Motor</li>
+ *         <li>Front Beam Break</li>
+ *         <li>Back Beam Break</li>
+ *     </ul>
+ * </p>
+ */
 public class IntakeSubsystem extends SubsystemBase {
     private final DcMotorImplEx intakeMotor;
 
     private final DigitalChannel frontBeamBreak,
                                  backBeamBreak;
 
+    private final Telemetry telemetry;
+
     private boolean shouldIntake, shouldOuttake;
 
     private boolean isActive;
 
-    public IntakeSubsystem(@NonNull HardwareMap hardwareMap) {
-        intakeMotor = hardwareMap.get(DcMotorImplEx.class, INTAKE_MOTOR_NAME);
+    /**
+     * Constructs a new intake subsystem
+     * @param opMode The opMode you are running ; To obtain the hardwareMap and telemetry objects
+     */
+    public IntakeSubsystem(@NonNull OpMode opMode) {
+        telemetry = opMode.telemetry;
 
-        frontBeamBreak = hardwareMap.get(DigitalChannel.class, FRONT_BEAM_BREAK_NAME);
-        backBeamBreak  = hardwareMap.get(DigitalChannel.class, BACK_BEAM_BREAK_NAME);
+        intakeMotor = opMode.hardwareMap.get(DcMotorImplEx.class, INTAKE_MOTOR_NAME);
+
+        frontBeamBreak = opMode.hardwareMap.get(DigitalChannel.class, FRONT_BEAM_BREAK_NAME);
+        backBeamBreak  = opMode.hardwareMap.get(DigitalChannel.class, BACK_BEAM_BREAK_NAME);
 
         frontBeamBreak.setMode(INPUT);
         backBeamBreak.setMode(INPUT);
@@ -115,10 +138,9 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     /**
-     * Displays debugArm information about the intake
-     * @param telemetry The telemetry to display the information on
+     * Displays debug information about the intake.
      */
-    public void debug(@NonNull Telemetry telemetry) {
+    public void debug() {
         telemetry.addLine("---- Intake Telemetry ----");
         telemetry.addData("Direction", intakeMotor.getDirection());
         telemetry.addData("Power", intakeMotor.getPower());
