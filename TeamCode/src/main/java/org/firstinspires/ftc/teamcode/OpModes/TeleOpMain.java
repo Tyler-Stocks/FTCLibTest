@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.command.button.Trigger;
@@ -20,6 +19,7 @@ import org.firstinspires.ftc.teamcode.Subsystems.Drive.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.Hanger.HangerSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake.Commands.IntakeCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake.Commands.OuttakeCommand;
+import org.firstinspires.ftc.teamcode.Subsystems.Intake.Commands.StopIntakeCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake.IntakeSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake.Triggers.BackBeamBreakTrigger;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake.Triggers.FrontBeamBreakTrigger;
@@ -118,7 +118,7 @@ public class TeleOpMain extends CommandOpMode {
     }
 
     private void setDefaultCommands() {
-        intakeSubsystem.setDefaultCommand(new InstantCommand(intakeSubsystem::stop));
+        intakeSubsystem.setDefaultCommand(new StopIntakeCommand(intakeSubsystem));
     }
 
     private void configureBindings() {

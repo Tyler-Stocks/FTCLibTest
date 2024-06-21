@@ -60,10 +60,8 @@ public class DriveSubsystem extends SubsystemBase {
 
         imu.initialize(IMU_PARAMETERS);
 
-        frontLeftMotor.setDirection(FRONT_LEFT_DRIVE_MOTOR_DIRECTION);
-        frontRightMotor.setDirection(FRONT_RIGHT_DRIVE_MOTOR_DIRECTION);
-        backLeftMotor.setDirection(BACK_LEFT_DRIVE_MOTOR_DIRECTION);
-        backRightMotor.setDirection(BACK_RIGHT_DRIVE_MOTOR_DIRECTION);
+        MotorUtility.setDirections(REVERSE, frontLeftMotor, backLeftMotor);
+        MotorUtility.setDirections(FORWARD, frontRightMotor, backRightMotor);
 
         MotorUtility.setMotorZeroPowerBehaviors(
                 BRAKE, frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
@@ -108,14 +106,16 @@ public class DriveSubsystem extends SubsystemBase {
 
         double frontLeftPower  = power * cos_theta / max + turn;
         double frontRightPower = power * sin_theta / max - turn;
-        double backLeftPower   = power * sin_theta / max - turn;
+        double backLeftPower   = power * sin_theta / max + turn;
         double backRightPower  = power * cos_theta / max - turn;
 
-        if ((power + Math.abs(turn)) > 1) {
-            frontLeftPower  /= power + Math.abs(turn);
-            frontRightPower /= power + Math.abs(turn);
-            backLeftPower   /= power + Math.abs(turn);
-            backRightPower  /= power + Math.abs(turn);
+        double turnMagnitude = Math.abs(turn);
+
+        if ((power + turnMagnitude) > 1.0) {
+            frontLeftPower  /= power + turnMagnitude;
+            frontRightPower /= power + turnMagnitude;
+            backLeftPower   /= power + turnMagnitude;
+            backRightPower  /= power + turnMagnitude;
         }
 
         frontLeftMotor.setPower(frontLeftPower);
@@ -167,7 +167,6 @@ public class DriveSubsystem extends SubsystemBase {
      * Displays debug information about the drive base
      */
     public void debugDrive() {
-
        telemetry.addLine("----- Drive Debug -----");
        telemetry.addData("Front Left Direction", frontLeftMotor.getDirection());
        telemetry.addData("Front Right Direction", frontRightMotor.getDirection());

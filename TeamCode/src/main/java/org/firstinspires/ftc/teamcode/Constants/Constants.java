@@ -129,11 +129,6 @@ public class Constants {
        public static final String BACK_RIGHT_DRIVE_MOTOR_NAME  = "backRightDriveMotor";
        public static final String IMU_NAME                     = "imu";
 
-       public static volatile Direction FRONT_LEFT_DRIVE_MOTOR_DIRECTION  = REVERSE;
-       public static volatile Direction FRONT_RIGHT_DRIVE_MOTOR_DIRECTION = Direction.FORWARD;
-       public static volatile Direction BACK_LEFT_DRIVE_MOTOR_DIRECTION   = REVERSE;
-       public static volatile Direction BACK_RIGHT_DRIVE_MOTOR_DIRECTION  = Direction.FORWARD;
-
        public static volatile double DRIVE_DEAD_ZONE  = 0.05;
        public static volatile double STRAFE_DEAD_ZONE = 0.05;
        public static volatile double TURN_DEAD_ZONE   = 0.05;

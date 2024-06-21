@@ -4,6 +4,8 @@ import static org.firstinspires.ftc.teamcode.Constants.Constants.IntakeConstants
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Constants.ConstantsLoader;
 import org.firstinspires.ftc.teamcode.PlayStationController.Triggers.LeftGamepadTrigger;
@@ -16,6 +18,8 @@ import org.firstinspires.ftc.teamcode.Subsystems.Intake.IntakeSubsystem;
 
 import java.io.IOException;
 
+@TeleOp(name = "Debug - Intake", group = "Debug")
+@Disabled
 public class IntakeDebug extends CommandOpMode {
     private IntakeSubsystem intakeSubsystem;
     private ArmSubsystem armSubsystem;
