@@ -25,6 +25,7 @@ import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Constants.ConstantsLoader;
 import org.firstinspires.ftc.teamcode.Subsystems.Arm.ArmSubsystem;
@@ -33,28 +34,48 @@ import org.firstinspires.ftc.teamcode.Subsystems.Arm.Triggers.ArmIsOutsideFrameT
 
 import java.io.IOException;
 
+@TeleOp(name = "Debug - Outtake", group = "Debug")
 public class OuttakeDebug extends CommandOpMode {
     private ArmSubsystem armSubsystem;
-    private GamepadEx operatorGamepad;
 
     @Override public void initialize() {
        loadConstants();
 
        armSubsystem = new ArmSubsystem(this);
 
-       operatorGamepad = new GamepadEx(gamepad2);
-
        configureBindings();
 
+       register(armSubsystem);
+
        schedule(
+               new RunCommand(this::displayHelpMessage),
                new RunCommand(armSubsystem::debugOuttake),
                new RunCommand(telemetry::update)
        );
+    }
 
-       register(armSubsystem);
+    private void displayHelpMessage() {
+        telemetry.addLine("To view arm and outtake controls, press share (The one on the left)");
+    }
+
+    private void displayArmInstructions() {
+        telemetry.addLine("Controlled Using Gamepad 2");
+        telemetry.addLine("----- Arm Controls -----");
+        telemetry.addLine("Dpad Down    => Home arm");
+        telemetry.addLine("Cross        => Move arm to bottom position");
+        telemetry.addLine("Square       => Move arm to low position");
+        telemetry.addLine("Circle       => Move arm to medium position");
+        telemetry.addLine("Triangle     => Move arm to high position");
+        telemetry.addLine("Options      => Move arm to top position");
+        telemetry.addLine("Left Bumper  => Open left outtake arm");
+        telemetry.addLine("Right Bumper => Open right outtake arm");
     }
 
     private void configureBindings() {
+        GamepadEx operatorGamepad = new GamepadEx(gamepad2);
+
+        // ---------- Arm Triggers (Controlled By Gamepad 2) ---------- //
+
         new GamepadButton(operatorGamepad, DPAD_DOWN)
                 .whenPressed(new SetArmTargetPositionCommand(
                         armSubsystem, 0, 0));
@@ -87,7 +108,7 @@ public class OuttakeDebug extends CommandOpMode {
                 .whenActive(new SetArmTargetPositionCommand(
                         armSubsystem, LAUNCHING_WORM_POSITION, 0));
 
-        // ---------- Outtake Triggers (Controlled By Operator) ---------- //
+        // ---------- Outtake Triggers (Controlled By Gamepad 2) ---------- //
 
         new GamepadButton(operatorGamepad, LEFT_BUMPER)
                 .and(new ArmIsOutsideFrameTrigger(armSubsystem))
@@ -96,6 +117,8 @@ public class OuttakeDebug extends CommandOpMode {
         new GamepadButton(operatorGamepad, RIGHT_BUMPER)
                 .and(new ArmIsOutsideFrameTrigger(armSubsystem))
                 .toggleWhenActive(armSubsystem::openRightOuttakeDoor, armSubsystem::closeRightOuttakeDoor);
+
+        // ---------- Debug Triggers (Controlled By Gamepad 2) ---------- //
     }
 
     private void loadConstants() {

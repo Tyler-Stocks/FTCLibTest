@@ -16,7 +16,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
  * <h1>Launcher Subsystem</h1>
  * <br>
  * <p>
- *     Subsystem to encapsulate the servo which controls the launching of the airplane. Constains
+ *     Subsystem to encapsulate the servo which controls the launching of the airplane. Contains
  *     the following hardware
  *     <ul>
  *         <li>Launcher Servo</li>

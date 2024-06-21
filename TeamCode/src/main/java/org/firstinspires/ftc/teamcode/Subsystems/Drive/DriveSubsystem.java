@@ -4,16 +4,13 @@ import static com.qualcomm.robotcore.hardware.DcMotor.ZeroPowerBehavior.*;
 import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.*;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorImplEx;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 import org.firstinspires.ftc.teamcode.Subsystems.Utility.MotorUtility;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.RADIANS;
@@ -60,10 +57,8 @@ public class DriveSubsystem extends SubsystemBase {
 
         imu.initialize(IMU_PARAMETERS);
 
-        frontLeftMotor.setDirection(FRONT_LEFT_DRIVE_MOTOR_DIRECTION);
-        frontRightMotor.setDirection(FRONT_RIGHT_DRIVE_MOTOR_DIRECTION);
-        backLeftMotor.setDirection(BACK_LEFT_DRIVE_MOTOR_DIRECTION);
-        backRightMotor.setDirection(BACK_RIGHT_DRIVE_MOTOR_DIRECTION);
+        MotorUtility.setDirections(REVERSE, frontLeftMotor, backLeftMotor);
+        MotorUtility.setDirections(FORWARD, frontRightMotor, backRightMotor);
 
         MotorUtility.setMotorZeroPowerBehaviors(
                 BRAKE, frontLeftMotor, frontRightMotor, backLeftMotor, backRightMotor);
@@ -94,9 +89,9 @@ public class DriveSubsystem extends SubsystemBase {
      * @param turn The turn value
      */
     public void driveRobotCentric(double drive, double strafe, double turn) {
-        if (drive < DRIVE_DEAD_ZONE)   drive  = 0.0;
-        if (strafe < STRAFE_DEAD_ZONE) strafe = 0.0;
-        if (turn < TURN_DEAD_ZONE)     turn   = 0.0;
+        if (Math.abs(drive)  < DRIVE_DEAD_ZONE)    drive  = 0.0;
+        if (Math.abs(strafe) < STRAFE_DEAD_ZONE)   strafe = 0.0;
+        if (Math.abs(turn)   < TURN_DEAD_ZONE)     turn   = 0.0;
 
         double theta = Math.atan2(drive, strafe);
         double power = Math.hypot(strafe, drive);
@@ -108,14 +103,16 @@ public class DriveSubsystem extends SubsystemBase {
 
         double frontLeftPower  = power * cos_theta / max + turn;
         double frontRightPower = power * sin_theta / max - turn;
-        double backLeftPower   = power * sin_theta / max - turn;
+        double backLeftPower   = power * sin_theta / max + turn;
         double backRightPower  = power * cos_theta / max - turn;
 
-        if ((power + Math.abs(turn)) > 1) {
-            frontLeftPower  /= power + Math.abs(turn);
-            frontRightPower /= power + Math.abs(turn);
-            backLeftPower   /= power + Math.abs(turn);
-            backRightPower  /= power + Math.abs(turn);
+        double turnMagnitude = Math.abs(turn);
+
+        if ((power + turnMagnitude) > 1.0) {
+            frontLeftPower  /= power + turnMagnitude;
+            frontRightPower /= power + turnMagnitude;
+            backLeftPower   /= power + turnMagnitude;
+            backRightPower  /= power + turnMagnitude;
         }
 
         frontLeftMotor.setPower(frontLeftPower);
@@ -131,9 +128,9 @@ public class DriveSubsystem extends SubsystemBase {
      * @param turn The value to turn
      */
     private void driveFieldCentric(double drive, double strafe, double turn) {
-        if (drive < DRIVE_DEAD_ZONE)   drive  = 0.0;
-        if (strafe < STRAFE_DEAD_ZONE) strafe = 0.0;
-        if (turn < TURN_DEAD_ZONE)     turn   = 0.0;
+        if (Math.abs(drive)  < DRIVE_DEAD_ZONE)    drive  = 0.0;
+        if (Math.abs(strafe) < STRAFE_DEAD_ZONE)   strafe = 0.0;
+        if (Math.abs(turn)   < TURN_DEAD_ZONE)     turn   = 0.0;
 
         double theta = Math.atan2(drive, strafe);
         double power = Math.hypot(strafe, drive);
@@ -150,11 +147,13 @@ public class DriveSubsystem extends SubsystemBase {
         double backLeftPower   = power * sin_theta / max - turn;
         double backRightPower  = power * cos_theta / max - turn;
 
-        if ((power + Math.abs(turn)) > 1) {
-            frontLeftPower  /= power + Math.abs(turn);
-            frontRightPower /= power + Math.abs(turn);
-            backLeftPower   /= power + Math.abs(turn);
-            backRightPower  /= power + Math.abs(turn);
+        double turnMagnitude = Math.abs(turn);
+
+        if ((power + turnMagnitude) > 1) {
+            frontLeftPower  /= power + turnMagnitude;
+            frontRightPower /= power + turnMagnitude;
+            backLeftPower   /= power + turnMagnitude;
+            backRightPower  /= power + turnMagnitude;
         }
 
         frontLeftMotor.setPower(frontLeftPower);
@@ -166,8 +165,7 @@ public class DriveSubsystem extends SubsystemBase {
     /**
      * Displays debug information about the drive base
      */
-    public void debugDrive() {
-
+    public void debug() {
        telemetry.addLine("----- Drive Debug -----");
        telemetry.addData("Front Left Direction", frontLeftMotor.getDirection());
        telemetry.addData("Front Right Direction", frontRightMotor.getDirection());
