@@ -162,4 +162,17 @@ public class LEDSubsystem extends SubsystemBase {
     public void setRightLEDOff() {
         rightLEDState = OFF;
     }
+
+    /**
+     * Displays debug information about the LED Subsystem
+     */
+    public void debug() {
+        telemetry.addLine("----- LED Subsystem Debug -----");
+        telemetry.addData("Left LED State", leftLEDState.toString());
+        telemetry.addData("Right LED State", rightLEDState.toString());
+        telemetry.addData("Left LED Green Channel State", leftLEDGreenChannel.getState());
+        telemetry.addData("Left LED Red Channel State", leftLEDRedChannel.getState());
+        telemetry.addData("Right LED Green Channel State", rightLEDGreenChannel.getState());
+        telemetry.addData("Right LED Red Channel State", rightLEDRedChannel.getState());
+    }
 }

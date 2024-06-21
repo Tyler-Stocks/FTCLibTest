@@ -13,8 +13,10 @@ import static org.firstinspires.ftc.teamcode.PlayStationController.PlayStationCo
 import org.firstinspires.ftc.teamcode.Constants.ConstantsLoader;
 import org.firstinspires.ftc.teamcode.Subsystems.Arm.ArmSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.Arm.Commands.SetArmTargetPositionCommand;
+import org.firstinspires.ftc.teamcode.Subsystems.Arm.Triggers.ArmIsAtHomeTrigger;
 import org.firstinspires.ftc.teamcode.Subsystems.Arm.Triggers.ArmIsOutsideFrameTrigger;
 import org.firstinspires.ftc.teamcode.Subsystems.Drive.Commands.DriveRobotCentricCommand;
+import org.firstinspires.ftc.teamcode.Subsystems.Drive.Commands.ResetIMUCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.Drive.DriveSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.Hanger.HangerSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.Intake.Commands.IntakeCommand;
@@ -171,7 +173,7 @@ public class TeleOpMain extends CommandOpMode {
         // ---------- Intake Triggers (Controlled By Operator) ---------- //
 
         new LeftGamepadTrigger(INTAKE_TRIGGER_THRESHOLD, operatorGamepad)
-                .and(new Trigger(armSubsystem::isAtHome)) // Prevent intaking when we are not homed
+                .and(new ArmIsAtHomeTrigger(armSubsystem)) // Prevent intaking when we are not homed
                 .whenActive(new IntakeCommand(intakeSubsystem, armSubsystem));
 
         new RightGamepadTrigger(OUTTAKE_TRIGGER_THRESHOLD, operatorGamepad)
@@ -209,7 +211,7 @@ public class TeleOpMain extends CommandOpMode {
         // ---------- Drive Commands (Controlled By Driver) ---------- //
 
         new GamepadButton(driverGamepad, OPTIONS)
-                .whenPressed(driveSubsystem::resetIMU);
+                .whenPressed(new ResetIMUCommand(driveSubsystem));
 
         // ---------- End Game Trigger (Controlled By Operator) ---------- //
 

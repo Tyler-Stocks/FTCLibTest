@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.OpModes.Debug;
 import static org.firstinspires.ftc.teamcode.PlayStationController.PlayStationController.OPTIONS;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
@@ -41,7 +40,7 @@ public class DriveDebug extends CommandOpMode {
                         driverGamepad::getRightX
                 ),
                 new RunCommand(this::displayHelpMessage),
-                new RunCommand(driveSubsystem::debugDrive),
+                new RunCommand(driveSubsystem::debug),
                 new RunCommand(telemetry::update)
         );
     }
