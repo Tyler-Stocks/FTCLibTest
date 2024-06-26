@@ -4,11 +4,11 @@ import androidx.annotation.NonNull;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 import static com.qualcomm.robotcore.hardware.Servo.Direction.*;
 
 import static org.firstinspires.ftc.teamcode.Constants.Constants.MosaicFixerConstants.*;
+import static org.firstinspires.ftc.teamcode.Subsystems.MosaicFixers.MosaicFixerPosition.;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -29,6 +29,9 @@ public class MosaicFixerSubsystem extends SubsystemBase {
 
     private final Telemetry telemetry;
 
+    private MosaicFixerPosition leftMosaicFixerPosition, rightMosaicFixerPosition;
+
+    private boolean enableLeftMosaicFixer, enableRightMosaicFixer;
 
     /**
      * Constructs a new MosaicFixerSubsystem
@@ -44,93 +47,102 @@ public class MosaicFixerSubsystem extends SubsystemBase {
 
         leftMosaicFixerServo.setDirection(REVERSE);
 
-        retractMosaicFixerLeft();
-        retractMosaicFixerRight();
+        enableLeftMosaicFixer  = true;
+        enableRightMosaicFixer = true;
+
+        leftMosaicFixerPosition  = RETRACTED;
+        rightMosaicFixerPosition = RETRACTED;
+
+        leftMosaicFixerServo.setPosition(MOSAIC_FIXER_LEFT_RETRACTED_POSITION);
+        rightMosaicFixerServo.setPosition(MOSAIC_FIXER_RIGHT_RETRACTED_POSITION);
+    }
+
+    @Override public void periodic() {
+        if (enableLeftMosaicFixer) {
+            leftMosaicFixerServo.setPwmEnable();
+        } else {
+            leftMosaicFixerServo.setPwmDisable();
+        }
+
+        if (enableRightMosaicFixer) {
+            rightMosaicFixerServo.setPwmEnable();
+        } else {
+            rightMosaicFixerServo.setPwmDisable();
+        }
+
+        switch (leftMosaicFixerPosition) {
+            case RETRACTED:
+                leftMosaicFixerServo.setPosition(MOSAIC_FIXER_LEFT_RETRACTED_POSITION);
+                break;
+            case LOW:
+                leftMosaicFixerServo.setPosition(MOSAIC_FIXER_LEFT_LOW_POSITION);
+                break;
+            case MEDIUM:
+                leftMosaicFixerServo.setPosition(MOSAIC_FIXER_LEFT_MEDIUM_POSITION);
+                break;
+            case HIGH:
+                leftMosaicFixerServo.setPosition(MOSAIC_FIXER_LEFT_HIGH_POSITION);
+                break;
+        }
+
+        switch (rightMosaicFixerPosition) {
+            case RETRACTED:
+                rightMosaicFixerServo.setPosition(MOSAIC_FIXER_RIGHT_RETRACTED_POSITION);
+                break;
+            case LOW:
+                rightMosaicFixerServo.setPosition(MOSAIC_FIXER_RIGHT_LOW_POSITION);
+                break;
+            case HIGH:
+                rightMosaicFixerServo.setPosition(MOSAIC_FIXER_RIGHT_HIGH_POSITION);
+                break;
+            default: // Right mosaic fixer has no medium position
+                break;
+        }
     }
 
 
     /**
-     * Disables the left mosaic fixer
+     * Signals to the subsystem to disable the left mosaic fixer
      */
     public void disableLeftMosaicFixer() {
-        leftMosaicFixerServo.setPwmDisable();
+        enableLeftMosaicFixer = false;
     }
 
     /**
-     * Disables the right mosaic fixer
+     * Signals to the subsystem to disable the right mosaic fixer
      */
     public void disableRightMosaicFixer() {
-        rightMosaicFixerServo.setPwmDisable();
+        enableRightMosaicFixer = false;
     }
 
     /**
-     * Enables the left mosaic fixer
+     * Signals to the subsystem to enable the left mosaic fixer
      */
     public void enableLeftMosaicFixer() {
-        leftMosaicFixerServo.setPwmEnable();
+        enableLeftMosaicFixer = true;
     }
 
     /**
-     * Enables the right mosaic fixer
+     * Signals to the subsystem to enable the right mosaic fixer
      */
     public void enableRightMosaicFixer() {
-        rightMosaicFixerServo.setPwmEnable();
+        enableRightMosaicFixer = true;
     }
 
     /**
-     * Moves the left mosaic fixer to the low position
+     * Signals to the subsystem that it should move the left mosaic fixer to the input position
+     * @param mosaicFixerPosition The position to move to
      */
-    public void moveLeftMosaicFixerToLowPosition() {
-        enableLeftMosaicFixer();
-        leftMosaicFixerServo.setPosition(MOSAIC_FIXER_LEFT_LOW_POSITION);
+    public void moveLeftMosaicFixerToPosition(@NonNull MosaicFixerPosition mosaicFixerPosition) {
+       leftMosaicFixerPosition = mosaicFixerPosition;
     }
 
     /**
-     * Moves the left mosaic fixer to the medium position
+     * Signals to the subsystem that it should move the right mosaic fixer to the input position
+     * @param mosaicFixerPosition The position to move to
      */
-    public void moveLeftMosaicFixerToMediumPosition() {
-        enableLeftMosaicFixer();
-        leftMosaicFixerServo.setPosition(MOSAIC_FIXER_LEFT_MEDIUM_POSITION);
-    }
-
-    /**
-     * Moves the left mosaic fixer to the high position
-     */
-    public void moveLeftMosaicFixerToHighPosition() {
-        enableLeftMosaicFixer();
-        leftMosaicFixerServo.setPosition(MOSAIC_FIXER_LEFT_HIGH_POSITION);
-    }
-
-    /**
-     * Moves the right mosaic fixer to the low position
-     */
-    public void moveRightMosaicFixerToLowPosition() {
-        enableRightMosaicFixer();
-        rightMosaicFixerServo.setPosition(MOSAIC_FIXER_RIGHT_LOW_POSITION);
-    }
-
-    /**
-     * Moves the right mosaic fixer to the high position
-     */
-    public void moveRightMosaicFixerToHighPosition() {
-        enableRightMosaicFixer();
-        rightMosaicFixerServo.setPosition(MOSAIC_FIXER_RIGHT_HIGH_POSITION);
-    }
-
-    /**
-     * Retracts the left mosaic fixer
-     */
-    public void retractMosaicFixerLeft() {
-        enableLeftMosaicFixer();
-        leftMosaicFixerServo.setPosition(MOSAIC_FIXER_LEFT_HOME_POSITION);
-    }
-
-    /**
-     * Retracts the right mosaic fixer
-     */
-    public void retractMosaicFixerRight() {
-        enableRightMosaicFixer();
-        rightMosaicFixerServo.setPosition(MOSAIC_FIXER_RIGHT_HOME_POSITION);
+    public void moveRightMosaicFixerToPosition(@NonNull MosaicFixerPosition mosaicFixerPosition) {
+       rightMosaicFixerPosition = mosaicFixerPosition;
     }
 
     /**
@@ -144,5 +156,9 @@ public class MosaicFixerSubsystem extends SubsystemBase {
         telemetry.addData("Right Mosaic Fixer Direction", rightMosaicFixerServo.getDirection());
         telemetry.addData("Left Mosaic Fixer PWM Enabled", leftMosaicFixerServo.isPwmEnabled());
         telemetry.addData("Right Mosaic Fixer PWM Enabled", rightMosaicFixerServo.isPwmEnabled());
+        telemetry.addData("Left Mosaic Fixer Enabled (Local)", enableLeftMosaicFixer);
+        telemetry.addData("Right Mosaic Fixer Enabled (Local)", enableRightMosaicFixer);
+        telemetry.addData("Left Mosaic Fixer State", leftMosaicFixerPosition);
+        telemetry.addData("Right Mosaic Fixer State", rightMosaicFixerPosition);
     }
 }

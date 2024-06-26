@@ -10,7 +10,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Optional;
 import java.util.Properties;
+
+import javax.lang.model.type.PrimitiveType;
 
 /**
  * <h1>Constants Loader</h1>
@@ -87,12 +90,45 @@ public class ConstantsLoader {
         if (!properties.containsKey(fieldName)) return;
 
         try {
-            if (fieldType.isAssignableFrom(double.class)) {
+            if (fieldType == double.class) {
                 field.setDouble(fieldName, getDoubleFromPropertiesFile(fieldName, properties));
             }
 
-            if (fieldType.isAssignableFrom(int.class)) {
+            if (fieldType == float.class) {
+                field.setFloat(fieldName, getFloatFromPropertiesFile(fieldName, properties));
+            }
+
+            if (fieldType == int.class) {
                 field.setInt(fieldName, getIntFromPropertiesFile(fieldName, properties));
+            }
+
+            if (fieldType == short.class) {
+                field.setShort(fieldName, getShortFromPropertiesFile(fieldName, properties));
+            }
+
+            if (fieldType == byte.class) {
+                field.setByte(fieldName, getByteFromPropertiesFile(fieldName, properties));
+            }
+
+            if (fieldType == long.class) {
+                field.setLong(fieldName, getLongFromPropertiesFile(fieldName, properties));
+            }
+
+            if (fieldType == boolean.class) {
+                field.setBoolean(field, getBooleanFromPropertiesFile(fieldName, properties));
+            }
+
+            if (fieldType == char.class) {
+                Optional<Character> characterFromPropertiesFile
+                        = getCharacterFromPropertiesFile(fieldName, properties);
+
+                if (!characterFromPropertiesFile.isPresent()) return;
+
+                field.setChar(fieldName, characterFromPropertiesFile.get());
+            }
+
+            if (fieldType == String.class) {
+                field.set(fieldName, getStringFromPropertiesFile(fieldName, properties));
             }
         } catch (IllegalAccessException ignored) {}
     }
@@ -141,5 +177,37 @@ public class ConstantsLoader {
 
     private int getIntFromPropertiesFile(@NonNull String key, @NonNull Properties properties) {
         return Integer.parseInt(properties.getProperty(key));
+    }
+
+    private float getFloatFromPropertiesFile(@NonNull String key, @NonNull Properties properties) {
+        return Float.parseFloat(properties.getProperty(key));
+    }
+
+    private short getShortFromPropertiesFile(@NonNull String key, @NonNull Properties properties) {
+        return Short.parseShort(properties.getProperty(key));
+    }
+
+    private byte getByteFromPropertiesFile(@NonNull String key, @NonNull Properties properties) {
+        return Byte.parseByte(properties.getProperty(key));
+    }
+
+    private long getLongFromPropertiesFile(@NonNull String key, @NonNull Properties properties) {
+        return Long.parseLong(properties.getProperty(key));
+    }
+
+    private Optional<Character> getCharacterFromPropertiesFile(@NonNull String key, @NonNull Properties properties) {
+        char[] characters = properties.getProperty(key).toCharArray();
+
+        if (characters.length > 1) return Optional.empty();
+
+        return Optional.of(characters[0]);
+    }
+
+    private boolean getBooleanFromPropertiesFile(@NonNull String key, @NonNull Properties properties) {
+       return Boolean.parseBoolean(properties.getProperty(key));
+    }
+
+    private String getStringFromPropertiesFile(@NonNull String key, @NonNull Properties properties) {
+        return properties.getProperty(key);
     }
 }
