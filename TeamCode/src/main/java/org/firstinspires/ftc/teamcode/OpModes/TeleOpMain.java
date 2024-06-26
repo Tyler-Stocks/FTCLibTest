@@ -29,8 +29,8 @@ import org.firstinspires.ftc.teamcode.Subsystems.LEDController.LEDSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher.LauncherSubsystem;
 import org.firstinspires.ftc.teamcode.PlayStationController.Triggers.LeftGamepadTrigger;
 import org.firstinspires.ftc.teamcode.PlayStationController.Triggers.RightGamepadTrigger;
-import org.firstinspires.ftc.teamcode.Subsystems.MosaicFixers.Commands.DisableLeftMosaicFixer;
-import org.firstinspires.ftc.teamcode.Subsystems.MosaicFixers.Commands.DisableRightMosaicFixer;
+import org.firstinspires.ftc.teamcode.Subsystems.MosaicFixers.Commands.MoveLeftMosaicFixerCommand;
+import org.firstinspires.ftc.teamcode.Subsystems.MosaicFixers.Commands.MoveRightMosaicFixerCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.MosaicFixers.MosaicFixerSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.PurplePixelPlacer.PurplePixelPlacerSubsystem;
 
@@ -38,12 +38,12 @@ import static org.firstinspires.ftc.teamcode.Constants.Constants.ArmConstants.*;
 import static org.firstinspires.ftc.teamcode.Constants.Constants.IntakeConstants.*;
 
 import static org.firstinspires.ftc.teamcode.OpModes.TeleOpMain.GameState.*;
+import static org.firstinspires.ftc.teamcode.Subsystems.MosaicFixers.MosaicFixerPosition.*;
 
 import java.io.IOException;
 
 @TeleOp(name = "TeleOpMain", group = "Test")
 public class TeleOpMain extends CommandOpMode {
-
     protected enum GameState {
         TELEOP,
         ENDGAME
@@ -75,7 +75,7 @@ public class TeleOpMain extends CommandOpMode {
         setDefaultCommands();
 
         configureBindings();
-        configureTriggers();
+        configureAutomiaticTriggers();
 
         register(launcherSubsystem,
                  hangerSubsystem,
@@ -100,7 +100,7 @@ public class TeleOpMain extends CommandOpMode {
         try {
             new ConstantsLoader().loadConstants();
         } catch (IOException ioException) {
-            telemetry.addData("Failed to load constants file", ioException.getCause());
+            telemetry.addData("Failed to load constants file", ioException.getMessage());
             telemetry.update();
         }
     }
@@ -126,7 +126,7 @@ public class TeleOpMain extends CommandOpMode {
     }
 
     private void configureBindings() {
-        // ---------- Arm Triggers (Controlled by operator) ---------- //
+        // ---------- Arm Triggers (Controlled By Gamepad 2) ---------- //
 
         new GamepadButton(operatorGamepad, DPAD_DOWN)
                 .whenPressed(new SetArmTargetPositionCommand(
@@ -162,70 +162,68 @@ public class TeleOpMain extends CommandOpMode {
                 .whenActive(new SetArmTargetPositionCommand(
                         armSubsystem, LAUNCHING_WORM_POSITION, 0));
 
-        // ---------- Outtake Triggers (Controlled By Operator) ---------- //
+        // ---------- Outtake Triggers (Controlled By Gamepad 2) ---------- //
 
         new GamepadButton(operatorGamepad, LEFT_BUMPER)
                 .and(new ArmIsOutsideFrameTrigger(armSubsystem))
-                .toggleWhenActive(armSubsystem::openLeftOuttakeDoor,
-                                  armSubsystem::closeLeftOuttakeDoor);
+                .and(new Trigger(this::isInTeleOp))
+                .whenActive(armSubsystem::openLeftOuttakeDoor);
 
         new GamepadButton(operatorGamepad, RIGHT_BUMPER)
                 .and(new ArmIsOutsideFrameTrigger(armSubsystem))
-                .toggleWhenActive(armSubsystem::openRightOuttakeDoor,
-                                  armSubsystem::closeRightOuttakeDoor);
+                .and(new Trigger(this::isInEndgame))
+                .whenActive(armSubsystem::openRightOuttakeDoor);
 
-        // ---------- Intake Triggers (Controlled By Operator) ---------- //
+        // ---------- Intake Triggers (Controlled By Gamepad 2) ---------- //
 
         new LeftGamepadTrigger(INTAKE_TRIGGER_THRESHOLD, operatorGamepad)
-                .and(new ArmIsAtHomeTrigger(armSubsystem)) // Prevent intaking when we are not homed
+                .and(new ArmIsAtHomeTrigger(armSubsystem)) // Prevent intaking when we aren't homed
                 .whenActive(new IntakeCommand(intakeSubsystem, armSubsystem));
 
         new RightGamepadTrigger(OUTTAKE_TRIGGER_THRESHOLD, operatorGamepad)
                 .whenActive(new OuttakeCommand(intakeSubsystem, armSubsystem));
 
-        // ---------- Mosaic Fixer Triggers (Controlled By Driver) ---------- //
+        // ---------- Mosaic Fixer Triggers (Controlled By Gamepad 1) ---------- //
 
         new GamepadButton(driverGamepad, LEFT_BUMPER)
-                .whenPressed(new DisableLeftMosaicFixer(mosaicFixerSubsystem));
+                .whenPressed(mosaicFixerSubsystem::disableLeftMosaicFixer);
 
         new GamepadButton(driverGamepad, RIGHT_BUMPER)
-                .whenPressed(new DisableRightMosaicFixer(mosaicFixerSubsystem));
+                .whenPressed(mosaicFixerSubsystem::disableRightMosaicFixer);
 
         new GamepadButton(driverGamepad, CROSS)
-                .whenPressed(mosaicFixerSubsystem::retractMosaicFixerRight);
+                .whenPressed(new MoveRightMosaicFixerCommand(mosaicFixerSubsystem, RETRACTED));
 
         new GamepadButton(driverGamepad, SQUARE)
-                .whenPressed(mosaicFixerSubsystem::moveRightMosaicFixerToLowPosition);
+                .whenPressed(new MoveRightMosaicFixerCommand(mosaicFixerSubsystem, LOW));
 
         new GamepadButton(driverGamepad, TRIANGLE)
-                .whenPressed(mosaicFixerSubsystem::moveRightMosaicFixerToHighPosition);
+                .whenPressed(new MoveRightMosaicFixerCommand(mosaicFixerSubsystem, HIGH));
 
         new GamepadButton(driverGamepad, DPAD_DOWN)
-                .whenPressed(mosaicFixerSubsystem::retractMosaicFixerLeft);
+                .whenPressed(new MoveLeftMosaicFixerCommand(mosaicFixerSubsystem, RETRACTED));
 
         new GamepadButton(driverGamepad, DPAD_LEFT)
-                .whenPressed(mosaicFixerSubsystem::moveLeftMosaicFixerToLowPosition);
+                .whenPressed(new MoveLeftMosaicFixerCommand(mosaicFixerSubsystem, LOW));
 
         new GamepadButton(driverGamepad, DPAD_RIGHT)
-                .whenPressed(mosaicFixerSubsystem::moveLeftMosaicFixerToMediumPosition);
+                .whenPressed(new MoveRightMosaicFixerCommand(mosaicFixerSubsystem, MEDIUM));
 
         new GamepadButton(driverGamepad, DPAD_UP)
-                .whenPressed(mosaicFixerSubsystem::moveLeftMosaicFixerToHighPosition);
+                .whenPressed(new MoveRightMosaicFixerCommand(mosaicFixerSubsystem, HIGH));
 
-        // ---------- Drive Commands (Controlled By Driver) ---------- //
+        // ---------- Drive Commands (Controlled By Gamepad 1) ---------- //
 
         new GamepadButton(driverGamepad, OPTIONS)
                 .whenPressed(new ResetIMUCommand(driveSubsystem));
 
-        // ---------- End Game Trigger (Controlled By Operator) ---------- //
+        // ---------- End Game Trigger (Controlled By Gamepad 2) ---------- //
 
         new GamepadButton(operatorGamepad, OPTIONS)
                 .whenPressed(this::toggleGameState);
     }
 
-    private void configureTriggers() {
-        // ---------- LED Triggers ---------- //
-
+    private void configureAutomiaticTriggers() {
         new FrontBeamBreakTrigger(intakeSubsystem)
                 .toggleWhenActive(ledSubsystem::setLeftLEDRed, ledSubsystem::setLeftLEDGreen);
 

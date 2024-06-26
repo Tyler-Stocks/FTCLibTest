@@ -3,8 +3,8 @@ package org.firstinspires.ftc.teamcode.Constants;
 
 import static com.qualcomm.hardware.rev.RevHubOrientationOnRobot.LogoFacingDirection.*;
 import static com.qualcomm.hardware.rev.RevHubOrientationOnRobot.UsbFacingDirection.UP;
-import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction.*;
-import static com.qualcomm.robotcore.hardware.DcMotorSimple.Direction;
+
+import android.util.Size;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.IMU.Parameters;
@@ -134,12 +134,12 @@ public class Constants {
        public static volatile double TURN_DEAD_ZONE   = 0.05;
 
        // ----- IMU Parameters ----- //
-       private static volatile UsbFacingDirection IMU_USB_DIRECTION   = UP;
-       private static volatile LogoFacingDirection IMU_LOGO_DIRECTION = RIGHT;
+       private static final UsbFacingDirection IMU_USB_DIRECTION   = UP;
+       private static final LogoFacingDirection IMU_LOGO_DIRECTION = RIGHT;
 
-       private static volatile RevHubOrientationOnRobot IMU_ORIENTATION_ON_ROBOT
+       private static  final RevHubOrientationOnRobot IMU_ORIENTATION_ON_ROBOT
                = new RevHubOrientationOnRobot(IMU_LOGO_DIRECTION, IMU_USB_DIRECTION);
-       public static volatile Parameters IMU_PARAMETERS
+       public static final Parameters IMU_PARAMETERS
                = new Parameters(IMU_ORIENTATION_ON_ROBOT);
     }
 
@@ -156,13 +156,25 @@ public class Constants {
         public static final String MOSAIC_FIXER_SERVO_LEFT_NAME  = "leftMosaicFixerServo";
         public static final String MOSAIC_FIXER_SERVO_RIGHT_NAME = "rightMosaicFixerServo";
 
-        public static volatile double MOSAIC_FIXER_LEFT_HOME_POSITION   = 0.0;
+        public static volatile double MOSAIC_FIXER_LEFT_RETRACTED_POSITION = 0.0;
         public static volatile double MOSAIC_FIXER_LEFT_LOW_POSITION    = 0.62;
         public static volatile double MOSAIC_FIXER_LEFT_MEDIUM_POSITION = 0.59;
         public static volatile double MOSAIC_FIXER_LEFT_HIGH_POSITION   = 0.54;
 
-        public static volatile double MOSAIC_FIXER_RIGHT_HOME_POSITION = 0.0;
+        public static volatile double MOSAIC_FIXER_RIGHT_RETRACTED_POSITION = 0.0;
         public static volatile double MOSAIC_FIXER_RIGHT_LOW_POSITION  = 0.61;
         public static volatile double MOSAIC_FIXER_RIGHT_HIGH_POSITION = 0.55;
+    }
+
+    @Config
+    public static class AprilTagConstants {
+        public static volatile float DECIMATION = 3.0f;
+
+        public static volatile double FX = 660.75;
+        public static volatile double FY = 660.75;
+        public static volatile double CX = 323.034;
+        public static volatile double CY = 230.681;
+
+        public static final Size APRIL_TAG_CAMERA_RESOLUTION = new Size(640, 480);
     }
 }
