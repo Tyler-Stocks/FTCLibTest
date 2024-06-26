@@ -49,22 +49,26 @@ public class ConstantsLoader {
 
     public ConstantsLoader() {}
 
-    @Nullable private File[] getConstantsFilesFromOnbotJava() throws IOException {
+    private File[] getConstantsFilesFromOnbotJava() throws IOException {
         File constantsDirectory = new File(CONSTANTS_FILE_LOCATION);
 
         if (constantsDirectory.isFile()) throw new IOException("Constants directory is a file");
 
-        return constantsDirectory.listFiles();
+        File[] constantsDirectoryFiles = constantsDirectory.listFiles();
+
+        if (constantsDirectoryFiles == null) return new File[]{};
+
+        return constantsDirectoryFiles;
     }
 
-    @Nullable private Class<?> matchConstantsClassToConstantsFile(@NonNull String fileName) {
+    private Optional<Class<?>> matchConstantsClassToConstantsFile(@NonNull String fileName) {
         for (Class<?> clazz : Constants.class.getDeclaredClasses()) {
             if (!Modifier.isStatic(clazz.getModifiers())) continue;
 
-            if (clazz.getSimpleName().equals(fileName)) return clazz;
+            if (clazz.getSimpleName().equals(fileName)) return Optional.of(clazz);
         }
 
-        return null;
+        return Optional.empty();
     }
 
     private void populateClassFromPropertiesFile(@NonNull Class<?> clazz, @NonNull String fileName) throws IOException {
@@ -139,21 +143,17 @@ public class ConstantsLoader {
      * @throws IOException if there is an issue reading any of the constants files
      */
     public void loadConstants() throws IOException {
-        File[] constantsFiles = getConstantsFilesFromOnbotJava();
-
-        if (constantsFiles == null) return;
-
-        for (File file : constantsFiles) {
+        for (File file : getConstantsFilesFromOnbotJava()) {
             if (!isTextFile(file)) continue;
 
             String fileName = file.getName();
 
-            Class<?> constantsClass
+            Optional<Class<?>> constantsClass
                     = matchConstantsClassToConstantsFile(stripFileExtension(fileName));
 
-            if (constantsClass == null) continue;
+            if (!constantsClass.isPresent()) continue;
 
-            populateClassFromPropertiesFile(constantsClass, fileName);
+            populateClassFromPropertiesFile(constantsClass.get(), fileName);
         }
     }
 
@@ -195,7 +195,10 @@ public class ConstantsLoader {
         return Long.parseLong(properties.getProperty(key));
     }
 
-    private Optional<Character> getCharacterFromPropertiesFile(@NonNull String key, @NonNull Properties properties) {
+    @NonNull private Optional<Character> getCharacterFromPropertiesFile(
+            @NonNull String key,
+            @NonNull Properties properties
+    ) {
         char[] characters = properties.getProperty(key).toCharArray();
 
         if (characters.length > 1) return Optional.empty();
