@@ -29,6 +29,8 @@ import org.firstinspires.ftc.teamcode.Subsystems.LEDController.LEDSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.Launcher.LauncherSubsystem;
 import org.firstinspires.ftc.teamcode.PlayStationController.Triggers.LeftGamepadTrigger;
 import org.firstinspires.ftc.teamcode.PlayStationController.Triggers.RightGamepadTrigger;
+import org.firstinspires.ftc.teamcode.Subsystems.MosaicFixers.Commands.DisableLeftMosaicFixer;
+import org.firstinspires.ftc.teamcode.Subsystems.MosaicFixers.Commands.DisableRightMosaicFixer;
 import org.firstinspires.ftc.teamcode.Subsystems.MosaicFixers.MosaicFixerSubsystem;
 import org.firstinspires.ftc.teamcode.Subsystems.PurplePixelPlacer.PurplePixelPlacerSubsystem;
 
@@ -164,11 +166,13 @@ public class TeleOpMain extends CommandOpMode {
 
         new GamepadButton(operatorGamepad, LEFT_BUMPER)
                 .and(new ArmIsOutsideFrameTrigger(armSubsystem))
-                .toggleWhenActive(armSubsystem::openLeftOuttakeDoor, armSubsystem::closeLeftOuttakeDoor);
+                .toggleWhenActive(armSubsystem::openLeftOuttakeDoor,
+                                  armSubsystem::closeLeftOuttakeDoor);
 
         new GamepadButton(operatorGamepad, RIGHT_BUMPER)
                 .and(new ArmIsOutsideFrameTrigger(armSubsystem))
-                .toggleWhenActive(armSubsystem::openRightOuttakeDoor, armSubsystem::closeRightOuttakeDoor);
+                .toggleWhenActive(armSubsystem::openRightOuttakeDoor,
+                                  armSubsystem::closeRightOuttakeDoor);
 
         // ---------- Intake Triggers (Controlled By Operator) ---------- //
 
@@ -182,10 +186,10 @@ public class TeleOpMain extends CommandOpMode {
         // ---------- Mosaic Fixer Triggers (Controlled By Driver) ---------- //
 
         new GamepadButton(driverGamepad, LEFT_BUMPER)
-                .whenPressed(mosaicFixerSubsystem::disableLeftMosaicFixer);
+                .whenPressed(new DisableLeftMosaicFixer(mosaicFixerSubsystem));
 
         new GamepadButton(driverGamepad, RIGHT_BUMPER)
-                .whenPressed(mosaicFixerSubsystem::disableRightMosaicFixer);
+                .whenPressed(new DisableRightMosaicFixer(mosaicFixerSubsystem));
 
         new GamepadButton(driverGamepad, CROSS)
                 .whenPressed(mosaicFixerSubsystem::retractMosaicFixerRight);

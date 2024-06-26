@@ -29,7 +29,7 @@ public class DriveRobotCentricCommand extends CommandBase {
     }
 
     @Override public void execute() {
-        this.drivebase.driveFieldCentric(
+        this.drivebase.driveRobotCentric(
                 driveSupplier.getAsDouble(),
                 strafeSupplier.getAsDouble(),
                 turnSupplier.getAsDouble());

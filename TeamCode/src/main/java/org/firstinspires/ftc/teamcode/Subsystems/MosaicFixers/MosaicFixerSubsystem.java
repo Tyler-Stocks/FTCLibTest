@@ -4,11 +4,11 @@ import androidx.annotation.NonNull;
 
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.ServoImplEx;
 import static com.qualcomm.robotcore.hardware.Servo.Direction.*;
 
 import static org.firstinspires.ftc.teamcode.Constants.Constants.MosaicFixerConstants.*;
+import static org.firstinspires.ftc.teamcode.Subsystems.MosaicFixers.MosaicFixerPosition.RETRACTED;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
@@ -29,6 +29,9 @@ public class MosaicFixerSubsystem extends SubsystemBase {
 
     private final Telemetry telemetry;
 
+    private boolean shouldEnableLeftMosaicFixer, shouldEnableRightMosaicFixer;
+
+    private MosaicFixerPosition leftMosaicFixerPosition, rightMosaicFixerPosition;
 
     /**
      * Constructs a new MosaicFixerSubsystem
@@ -44,8 +47,57 @@ public class MosaicFixerSubsystem extends SubsystemBase {
 
         leftMosaicFixerServo.setDirection(REVERSE);
 
+        shouldEnableLeftMosaicFixer  = false;
+        shouldEnableRightMosaicFixer = false;
+
+        leftMosaicFixerPosition  = RETRACTED;
+        rightMosaicFixerPosition = RETRACTED;
+
         retractMosaicFixerLeft();
         retractMosaicFixerRight();
+    }
+
+    @Override public void periodic() {
+        if (shouldEnableLeftMosaicFixer) {
+            leftMosaicFixerServo.setPwmEnable();
+        } else {
+            leftMosaicFixerServo.setPwmDisable();
+        }
+
+        if (shouldEnableRightMosaicFixer) {
+            rightMosaicFixerServo.setPwmEnable();
+        } else {
+            rightMosaicFixerServo.setPwmDisable();
+        }
+
+        switch (leftMosaicFixerPosition) {
+            case RETRACTED:
+                leftMosaicFixerServo.setPosition(MOSAIC_FIXER_LEFT_HOME_POSITION);
+                break;
+            case LOW:
+                leftMosaicFixerServo.setPosition(MOSAIC_FIXER_LEFT_LOW_POSITION);
+                break;
+            case MEDIUM:
+                leftMosaicFixerServo.setPosition(MOSAIC_FIXER_LEFT_MEDIUM_POSITION);
+                break;
+            case HIGH:
+                leftMosaicFixerServo.setPosition(MOSAIC_FIXER_LEFT_HIGH_POSITION);
+                break;
+        }
+
+        switch (rightMosaicFixerPosition) {
+            case RETRACTED:
+                rightMosaicFixerServo.setPosition(MOSAIC_FIXER_RIGHT_HOME_POSITION);
+                break;
+            case LOW:
+                rightMosaicFixerServo.setPosition(MOSAIC_FIXER_RIGHT_LOW_POSITION);
+                break;
+            case HIGH:
+                rightMosaicFixerServo.setPosition(MOSAIC_FIXER_RIGHT_HIGH_POSITION);
+                break;
+            default:
+                break;
+        }
     }
 
 
