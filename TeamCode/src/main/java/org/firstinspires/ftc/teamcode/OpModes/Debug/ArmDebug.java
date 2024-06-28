@@ -24,7 +24,7 @@ public class ArmDebug extends CommandOpMode {
     private ArmSubsystem armSubsystem;
 
     @Override public void initialize() {
-       loadConstants();
+       new ConstantsLoader().loadConstants();
 
        armSubsystem = new ArmSubsystem(this);
 
@@ -56,15 +56,6 @@ public class ArmDebug extends CommandOpMode {
         telemetry.addLine("Options      => Move arm to top position");
         telemetry.addLine("Left Bumper  => Open left outtake arm");
         telemetry.addLine("Right Bumper => Open right outtake arm");
-    }
-
-    private void loadConstants() {
-        try {
-            new ConstantsLoader().loadConstants();
-        } catch (IOException ioException) {
-            telemetry.addData("Failed to load constants file", ioException.getMessage());
-            telemetry.update();
-        }
     }
 
     private void configureBindings() {

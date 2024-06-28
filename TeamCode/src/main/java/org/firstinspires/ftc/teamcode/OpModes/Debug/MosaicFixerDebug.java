@@ -1,34 +1,25 @@
 package org.firstinspires.ftc.teamcode.OpModes.Debug;
 
-import static org.firstinspires.ftc.teamcode.PlayStationController.PlayStationController.CROSS;
-import static org.firstinspires.ftc.teamcode.PlayStationController.PlayStationController.DPAD_DOWN;
-import static org.firstinspires.ftc.teamcode.PlayStationController.PlayStationController.DPAD_LEFT;
-import static org.firstinspires.ftc.teamcode.PlayStationController.PlayStationController.DPAD_RIGHT;
-import static org.firstinspires.ftc.teamcode.PlayStationController.PlayStationController.DPAD_UP;
-import static org.firstinspires.ftc.teamcode.PlayStationController.PlayStationController.LEFT_BUMPER;
-import static org.firstinspires.ftc.teamcode.PlayStationController.PlayStationController.OPTIONS;
-import static org.firstinspires.ftc.teamcode.PlayStationController.PlayStationController.RIGHT_BUMPER;
-import static org.firstinspires.ftc.teamcode.PlayStationController.PlayStationController.SQUARE;
-import static org.firstinspires.ftc.teamcode.PlayStationController.PlayStationController.TRIANGLE;
+import static org.firstinspires.ftc.teamcode.Subsystems.MosaicFixers.MosaicFixerPosition.*;
+import static org.firstinspires.ftc.teamcode.PlayStationController.PlayStationController.*;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
-import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.RunCommand;
 import com.arcrobotics.ftclib.command.button.GamepadButton;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.Constants.ConstantsLoader;
+import org.firstinspires.ftc.teamcode.Subsystems.MosaicFixers.Commands.MoveLeftMosaicFixerCommand;
+import org.firstinspires.ftc.teamcode.Subsystems.MosaicFixers.Commands.MoveRightMosaicFixerCommand;
 import org.firstinspires.ftc.teamcode.Subsystems.MosaicFixers.MosaicFixerSubsystem;
-
-import java.io.IOException;
 
 @TeleOp(name = "Debug - Mosaic Fixer", group = "Debug")
 public class MosaicFixerDebug extends CommandOpMode {
     private MosaicFixerSubsystem mosaicFixerSubsystem;
 
     @Override public void initialize() {
-       loadConstants();
+       new ConstantsLoader().loadConstants();
 
        mosaicFixerSubsystem = new MosaicFixerSubsystem(this);
 
@@ -75,37 +66,29 @@ public class MosaicFixerDebug extends CommandOpMode {
                 .whenPressed(mosaicFixerSubsystem::disableRightMosaicFixer);
 
         new GamepadButton(driverGamepad, CROSS)
-                .whenPressed(mosaicFixerSubsystem::retractMosaicFixerRight);
+                .whenPressed(new MoveRightMosaicFixerCommand(mosaicFixerSubsystem, RETRACTED));
 
         new GamepadButton(driverGamepad, SQUARE)
-                .whenPressed(mosaicFixerSubsystem::moveRightMosaicFixerToLowPosition);
+                .whenPressed(new MoveRightMosaicFixerCommand(mosaicFixerSubsystem, LOW));
 
         new GamepadButton(driverGamepad, TRIANGLE)
-                .whenPressed(mosaicFixerSubsystem::moveRightMosaicFixerToHighPosition);
+                .whenPressed(new MoveRightMosaicFixerCommand(mosaicFixerSubsystem, MEDIUM));
 
         new GamepadButton(driverGamepad, DPAD_DOWN)
-                .whenPressed(mosaicFixerSubsystem::retractMosaicFixerLeft);
+                .whenPressed(new MoveRightMosaicFixerCommand(mosaicFixerSubsystem, HIGH));
 
         new GamepadButton(driverGamepad, DPAD_LEFT)
-                .whenPressed(mosaicFixerSubsystem::moveLeftMosaicFixerToLowPosition);
+                .whenPressed(new MoveLeftMosaicFixerCommand(mosaicFixerSubsystem, RETRACTED));
 
         new GamepadButton(driverGamepad, DPAD_RIGHT)
-                .whenPressed(mosaicFixerSubsystem::moveLeftMosaicFixerToMediumPosition);
+                .whenPressed(new MoveLeftMosaicFixerCommand(mosaicFixerSubsystem, LOW));
 
         new GamepadButton(driverGamepad, DPAD_UP)
-                .whenPressed(mosaicFixerSubsystem::moveLeftMosaicFixerToHighPosition);
+                .whenPressed(new MoveLeftMosaicFixerCommand(mosaicFixerSubsystem, HIGH));
 
         // ---------- Debug Instructions (Controlled Gamepad 1) ---------- //
 
         new GamepadButton(driverGamepad, OPTIONS)
                 .whenPressed(this::displayDebugInstructions);
-    }
-
-    private void loadConstants() {
-        try {
-            new ConstantsLoader().loadConstants();
-        } catch (IOException ioException) {
-            telemetry.addData("Failed to load constants from file", ioException.getMessage());
-        }
     }
 }

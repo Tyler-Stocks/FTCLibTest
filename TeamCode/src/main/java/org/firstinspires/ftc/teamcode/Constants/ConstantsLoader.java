@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.Constants;
 import android.annotation.SuppressLint;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,8 +11,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Optional;
 import java.util.Properties;
-
-import javax.lang.model.type.PrimitiveType;
 
 /**
  * <h1>Constants Loader</h1>
@@ -49,10 +46,10 @@ public class ConstantsLoader {
 
     public ConstantsLoader() {}
 
-    private File[] getConstantsFilesFromOnbotJava() throws IOException {
+    @NonNull private File[] getConstantsFilesFromOnbotJava() {
         File constantsDirectory = new File(CONSTANTS_FILE_LOCATION);
 
-        if (constantsDirectory.isFile()) throw new IOException("Constants directory is a file");
+        if (constantsDirectory.isFile()) return new File[]{};
 
         File[] constantsDirectoryFiles = constantsDirectory.listFiles();
 
@@ -140,9 +137,8 @@ public class ConstantsLoader {
     /**
      * Loads all of the constants with the constants found in Onbot Java under the Constants
      * directory
-     * @throws IOException if there is an issue reading any of the constants files
      */
-    public void loadConstants() throws IOException {
+    public void loadConstants() {
         for (File file : getConstantsFilesFromOnbotJava()) {
             if (!isTextFile(file)) continue;
 
@@ -153,7 +149,9 @@ public class ConstantsLoader {
 
             if (!constantsClass.isPresent()) continue;
 
-            populateClassFromPropertiesFile(constantsClass.get(), fileName);
+            try {
+                populateClassFromPropertiesFile(constantsClass.get(), fileName);
+            } catch (IOException ignored) {}
         }
     }
 
@@ -206,11 +204,17 @@ public class ConstantsLoader {
         return Optional.of(characters[0]);
     }
 
-    private boolean getBooleanFromPropertiesFile(@NonNull String key, @NonNull Properties properties) {
+    private boolean getBooleanFromPropertiesFile(
+            @NonNull String key,
+            @NonNull Properties properties
+    ) {
        return Boolean.parseBoolean(properties.getProperty(key));
     }
 
-    private String getStringFromPropertiesFile(@NonNull String key, @NonNull Properties properties) {
+    private String getStringFromPropertiesFile(
+            @NonNull String key,
+            @NonNull Properties properties
+    ) {
         return properties.getProperty(key);
     }
 }

@@ -39,7 +39,7 @@ public class OuttakeDebug extends CommandOpMode {
     private ArmSubsystem armSubsystem;
 
     @Override public void initialize() {
-       loadConstants();
+       new ConstantsLoader().loadConstants();
 
        armSubsystem = new ArmSubsystem(this);
 
@@ -119,13 +119,5 @@ public class OuttakeDebug extends CommandOpMode {
                 .toggleWhenActive(armSubsystem::openRightOuttakeDoor, armSubsystem::closeRightOuttakeDoor);
 
         // ---------- Debug Triggers (Controlled By Gamepad 2) ---------- //
-    }
-
-    private void loadConstants() {
-        try {
-            new ConstantsLoader().loadConstants();
-        } catch (IOException ioException) {
-            telemetry.addData("Failed to read constants file", ioException.getMessage());
-        }
     }
 }

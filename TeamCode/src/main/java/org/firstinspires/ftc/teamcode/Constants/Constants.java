@@ -170,6 +170,10 @@ public class Constants {
     public static class AprilTagConstants {
         public static volatile float DECIMATION = 3.0f;
 
+        public static volatile int EXPOSURE_MS   = 2;
+        public static volatile int GAIN          = 2;
+        public static volatile int WHITE_BALANCE_TEMPERATURE = 4000;
+
         public static volatile double FX = 660.75;
         public static volatile double FY = 660.75;
         public static volatile double CX = 323.034;

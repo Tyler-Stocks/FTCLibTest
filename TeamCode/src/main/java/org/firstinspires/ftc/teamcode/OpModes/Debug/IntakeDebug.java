@@ -30,7 +30,7 @@ public class IntakeDebug extends CommandOpMode {
     private ArmSubsystem armSubsystem;
 
     @Override public void initialize() {
-        loadConstants();
+        new ConstantsLoader().loadConstants();
 
         armSubsystem    = new ArmSubsystem(this);
         intakeSubsystem = new IntakeSubsystem(this);
@@ -78,14 +78,5 @@ public class IntakeDebug extends CommandOpMode {
         telemetry.addLine("----- Intake Controls -----");
         telemetry.addLine("Left Trigger  => intake");
         telemetry.addLine("Right Trigger => outtake");
-    }
-
-    private void loadConstants() {
-        try {
-            new ConstantsLoader().loadConstants();
-        } catch (IOException ioException) {
-            telemetry.addLine("Failed to load constants " + ioException.getMessage());
-            telemetry.update();
-        }
     }
 }

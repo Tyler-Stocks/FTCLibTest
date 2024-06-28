@@ -26,7 +26,7 @@ public class HangerDebug extends CommandOpMode {
     private ArmSubsystem armSubsystem;
 
     @Override public void initialize() {
-        loadConstants();
+        new ConstantsLoader().loadConstants();
 
         armSubsystem    = new ArmSubsystem(this);
         hangerSubsystem = new HangerSubsystem(this);
@@ -61,14 +61,5 @@ public class HangerDebug extends CommandOpMode {
 
         new GamepadButton(operatorGamepad, SHARE)
                 .whenPressed(this::displayHangerControls);
-    }
-
-    private void loadConstants() {
-        try {
-            new ConstantsLoader().loadConstants();
-        } catch (IOException ioException) {
-            telemetry.addLine("Failed to load constants " + ioException.getMessage());
-            telemetry.update();
-        }
     }
 }

@@ -22,7 +22,7 @@ public class DriveDebug extends CommandOpMode {
     private GamepadEx driverGamepad;
 
     @Override public void initialize() {
-        loadConstants();
+        new ConstantsLoader().loadConstants();
 
         driveSubsystem = new DriveSubsystem(this);
 
@@ -62,14 +62,5 @@ public class DriveDebug extends CommandOpMode {
 
        new GamepadButton(driverGamepad, OPTIONS)
                .whenPressed(this::displayDriveControls);
-    }
-
-    private void loadConstants() {
-         try {
-             new ConstantsLoader().loadConstants();
-         } catch (IOException ioException) {
-             telemetry.addLine("Failed to load constants " + ioException.getMessage());
-             telemetry.update();
-         }
     }
 }
